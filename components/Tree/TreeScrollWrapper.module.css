@@ -1,0 +1,12 @@
+.treeContainer {
+  overflow: auto;
+  width: 100%;
+  position: relative;
+  user-select: none;
+}
+
+.innerZoomContainer {
+  display: inline-block;
+  min-width: 1000px;
+  transform-origin: top left;
+}

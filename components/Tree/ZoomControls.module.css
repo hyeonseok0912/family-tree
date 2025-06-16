@@ -1,0 +1,24 @@
+.zoomControls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  z-index: 1000;
+}
+
+.zoomControls button {
+  padding: 4px 10px;
+  font-size: 18px;
+  font-weight: bolder;
+  background: lightskyblue;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.zoomControls button:hover {
+  background-color: rgba(0, 110, 255, 0.658);
+}

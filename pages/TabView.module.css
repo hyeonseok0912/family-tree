@@ -1,0 +1,105 @@
+.tabWrapper {
+  display: flex;
+  justify-content: flex-start;
+  margin: 1rem 0;
+  padding-left: 1rem;
+  gap: 0;
+}
+
+.tabWrapper button {
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background-color: #eaeaea;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tabWrapper button:hover {
+  background-color: #dcdcdc;
+}
+
+.tabWrapper .active {
+  background-color: #ffffff;
+  color: #000;
+  font-weight: bold;
+  border: 2px solid #0070f3;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.contentBox {
+  border: 2px solid #ccc;
+  padding: 0 2rem 2rem 2rem;
+  margin: 0 1rem;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  background: #fff;
+}
+
+.createButton {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: #007bff;
+  color: white;
+  padding: 0.8rem 1.4rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+}
+
+.createButton:hover {
+  background-color: #0056b3;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem 1rem;
+  background-color: #f4f4f4;
+  border-bottom: 1px solid #ccc;
+}
+
+.loginBox {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loginBox span {
+  font-size: 1rem;
+  color: #333;
+}
+
+.loginBox button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.loginBox button:hover {
+  background-color: #0056b3;
+}
+
+.footer {
+  margin-top: 2rem;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: bolder;
+  color: #666;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+}

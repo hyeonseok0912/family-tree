@@ -1,0 +1,42 @@
+.label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.label input,
+.label textarea {
+  margin-top: 0.4rem;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+}
+
+.label textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.required {
+  background-color: #ffe5e5;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+  padding: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.readOnly {
+  background-color: #f0f0f0;
+  color: #888;
+  cursor: not-allowed;
+  pointer-events: none; /* 입력도 못하게 막음 */
+}

@@ -1,0 +1,62 @@
+.pagination {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.pagination button {
+  padding: 0.5rem 0.8rem;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #005ac1;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.activePage {
+  background-color: #ff4d4f !important;
+  color: #fff !important;
+  font-weight: bold;
+  border: 2px solid #0070f3;
+  box-shadow: 0 0 8px rgba(0, 112, 243, 0.4);
+  pointer-events: none;
+}
+
+.select {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+}
+
+/* 📱 반응형 UI */
+@media (max-width: 600px) {
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .pagination button,
+  .select {
+    width: 100%;
+    font-size: 1rem;
+  }
+}
