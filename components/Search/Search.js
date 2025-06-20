@@ -36,7 +36,7 @@ export default function Search({ onSearch }) {
           placeholderText="출생 시작 연도"
           className={styles.yearPicker}
         />
-        <p> ~ </p>
+        <span> ~ </span>
         <DatePicker
           selected={endYear}
           onChange={(date) => setEndYear(date)}
@@ -45,7 +45,9 @@ export default function Search({ onSearch }) {
           placeholderText="출생 종료 연도"
           className={styles.yearPicker}
         />
+      </div>
 
+      <div className={styles.nameSearchWrapper}>
         <input
           type="text"
           placeholder="이름을 입력하세요"
@@ -57,6 +59,7 @@ export default function Search({ onSearch }) {
           🔍 검색
         </button>
       </div>
+
       {error && <p className={styles.error}>{error}</p>}
     </form>
   );

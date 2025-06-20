@@ -17,8 +17,23 @@
   border-radius: 4px;
   cursor: pointer;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
 }
 
 .zoomControls button:hover {
   background-color: rgba(0, 110, 255, 0.658);
+}
+
+/* 📱 모바일 대응 */
+@media (max-width: 600px) {
+  .zoomControls {
+    top: 8px;
+    left: 8px;
+    gap: 0.3rem;
+  }
+
+  .zoomControls button {
+    padding: 3px 8px;
+    font-size: 16px;
+  }
 }

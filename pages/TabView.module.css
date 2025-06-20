@@ -1,13 +1,14 @@
 .tabWrapper {
   display: flex;
   justify-content: flex-start;
+  flex-wrap: wrap;
   margin: 1rem 0;
-  padding-left: 1rem;
-  gap: 0;
+  padding: 0 1rem; /* ✅ 오타 수정 */
+  gap: 0.5rem;
 }
 
 .tabWrapper button {
-  padding: 0.6rem 1.5rem;
+  padding: 0.5rem 1rem;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-bottom: none;
@@ -16,6 +17,12 @@
   color: #333;
   cursor: pointer;
   transition: background-color 0.3s ease;
+
+  /* ✅ 추가된 속성 */
+  flex-shrink: 1;
+  white-space: nowrap;
+  min-width: fit-content;
+  max-width: 100%;
 }
 
 .tabWrapper button:hover {
@@ -66,6 +73,7 @@
   padding: 1.5rem 2rem 1rem;
   background-color: #f4f4f4;
   border-bottom: 1px solid #ccc;
+  flex-wrap: wrap;
 }
 
 .loginBox {
@@ -102,4 +110,69 @@
   color: #666;
   background-color: #f9f9f9;
   border-top: 1px solid #ddd;
+  line-height: 1.6;
+}
+
+/* ✅ 모바일 대응 */
+@media (max-width: 600px) {
+  .tabWrapper {
+    justify-content: center;
+    padding: 0;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .tabWrapper button {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .contentBox {
+    margin: 0 0.5rem;
+    padding: 1rem;
+  }
+
+  .createButton {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 6px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .loginBox {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .loginBox span {
+    font-size: 0.9rem;
+  }
+
+  .loginBox button {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.7rem;
+  }
+
+  .footer {
+    font-size: 0.85rem;
+  }
+
+  .lineBreak {
+    display: block; /* 줄바꿈 유지 */
+  }
+}
+
+@media (min-width: 601px) {
+  .lineBreak {
+    display: none;
+  }
 }

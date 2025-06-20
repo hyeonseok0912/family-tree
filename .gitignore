@@ -1,2 +1,11 @@
-"node_modules\n.next\n.env.local" 
-node_modules
+# 환경 변수
+.env.local
+
+# PostgreSQL 연결 설정 파일
+db_pg.js
+
+# node_modules는 보통 자동 포함되어 있음
+node_modules/
+
+# 기타
+.DS_Store

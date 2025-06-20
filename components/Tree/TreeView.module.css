@@ -4,4 +4,17 @@
   height: 625px;
   background-color: #f8f9fa;
   border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+/* 트리 그래프 자체를 감싸는 컨테이너 */
+.treeContainer {
+  position: relative;
+}
+
+/* 모바일 대응 */
+@media (max-width: 600px) {
+  .treeWrapper {
+    height: 500px; /* 모바일에선 높이 축소 */
+  }
 }

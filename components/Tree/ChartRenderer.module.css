@@ -7,6 +7,9 @@
   text-align: center;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.95rem;
+  word-break: break-word;
+  max-width: 160px;
 }
 
 .orgNode:hover {
@@ -25,4 +28,14 @@
   border-radius: 8px;
   box-shadow: 0 0 15px rgba(255, 160, 0, 0.6);
   transition: all 0.3s ease;
+}
+
+/* 📱 모바일 대응 */
+@media (max-width: 600px) {
+  .orgNode {
+    font-size: 0.85rem;
+    min-width: 70px;
+    padding: 8px;
+    max-width: 130px;
+  }
 }

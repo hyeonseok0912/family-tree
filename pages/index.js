@@ -141,7 +141,9 @@ export default function Home() {
       )}
 
       <footer className={styles.footer}>
-        시스템 문제 발생 및 건의시 010 - 3531 - 2948로 연락주세요.
+        시스템 문제 발생 및 건의시{" "}
+        <br className={styles.lineBreak} />
+        010 - 3531 - 2948로 연락주세요.
       </footer>
     </main>
   );

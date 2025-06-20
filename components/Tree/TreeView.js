@@ -4,6 +4,7 @@ import TreeScrollWrapper from "./TreeScrollWrapper";
 import LoadingOverlay from "./LoadingOverlay";
 import ModalDetail from "../Modal/ModalDetail";
 import styles from "./TreeView.module.css";
+import ExportButtons from "../UI/ExportButtons";
 
 export default function TreeView({
   searchQuery,
@@ -21,6 +22,7 @@ export default function TreeView({
   const zoomRef = useRef(1);
   const wrapperRef = useRef(null);
   const isDragging = useRef(false);
+  const treeRef = useRef(null);
 
   useEffect(() => {
     setLoading(true);
@@ -79,41 +81,47 @@ export default function TreeView({
   }, []);
 
   return (
-    <div className={styles.treeWrapper}>
-      <ZoomControls onZoom={handleZoom} />
+    <div className={styles.treeContainer}>
+      <ExportButtons targetRef={treeRef} fileName="family_tree" />
 
-      {loading ? (
-        <LoadingOverlay />
-      ) : (
-        <TreeScrollWrapper
-          wrapperRef={wrapperRef}
-          zoomRender={zoomRender}
-          members={members}
-          focusId={focusId}
-          clearFocusId={clearFocusId}
-          highlightedId={highlightedId}
-          setHighlightedId={setHighlightedId}
-          setLoading={setLoading}
-          setSelectedMember={setSelectedMember}
-          isDragging={isDragging}
-        />
-      )}
+      <div ref={treeRef}>
+        <div className={styles.treeWrapper}>
+          <ZoomControls onZoom={handleZoom} />
 
-      {selectedMember && (
-        <ModalDetail
-          member={selectedMember}
-          onClose={() => setSelectedMember(null)}
-          onUpdated={(updated) => {
-            setMembers((prev) =>
-              prev.map((m) => (m.id === updated.id ? updated : m))
-            );
-            setSelectedMember(updated);
-          }}
-          isAdmin={isAdmin}
-        />
-      )}
+          {loading ? (
+            <LoadingOverlay />
+          ) : (
+            <TreeScrollWrapper
+              wrapperRef={wrapperRef}
+              zoomRender={zoomRender}
+              members={members}
+              focusId={focusId}
+              clearFocusId={clearFocusId}
+              highlightedId={highlightedId}
+              setHighlightedId={setHighlightedId}
+              setLoading={setLoading}
+              setSelectedMember={setSelectedMember}
+              isDragging={isDragging}
+            />
+          )}
 
-      {loading && <LoadingOverlay />}
+          {selectedMember && (
+            <ModalDetail
+              member={selectedMember}
+              onClose={() => setSelectedMember(null)}
+              onUpdated={(updated) => {
+                setMembers((prev) =>
+                  prev.map((m) => (m.id === updated.id ? updated : m))
+                );
+                setSelectedMember(updated);
+              }}
+              isAdmin={isAdmin}
+            />
+          )}
+
+          {loading && <LoadingOverlay />}
+        </div>
+      </div>
     </div>
   );
 }

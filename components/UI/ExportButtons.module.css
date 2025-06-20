@@ -1,0 +1,40 @@
+.buttonGroup {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+/* 기본 버튼 스타일 (데스크톱 + 모바일 공통) */
+.exportBtn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+/* 호버 효과 */
+.exportBtn:hover {
+  background-color: #0056b3;
+}
+
+/* ✅ 모바일 반응형 개선 */
+@media (max-width: 600px) {
+  .buttonGroup {
+    flex-direction: row; /* 세로가 아닌 줄 정렬 유지 */
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .exportBtn {
+    width: auto; /* ✅ 가로폭 자동 */
+    font-size: 0.85rem; /* ✅ 글자 크기 살짝 줄임 */
+    padding: 4px 8px; /* ✅ 안쪽 여백 줄임 */
+  }
+}

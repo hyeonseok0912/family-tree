@@ -3,10 +3,19 @@
   width: 100%;
   position: relative;
   user-select: none;
+  touch-action: pan-x pan-y; /* ✅ 모바일 스크롤 지원 */
 }
 
 .innerZoomContainer {
   display: inline-block;
   min-width: 1000px;
   transform-origin: top left;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* 모바일 대응 */
+@media (max-width: 600px) {
+  .innerZoomContainer {
+    min-width: 600px; /* ✅ 모바일에서 너무 큰 초기 폭 조정 */
+  }
 }

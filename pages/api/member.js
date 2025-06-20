@@ -6,11 +6,14 @@ export default async function handler(req, res) {
 
     try {
       const result = await pool.query(
-        `SELECT m.*, 
-                p.name AS parent_name 
-         FROM family_members m
-         LEFT JOIN family_members p ON m.parent_id = p.id
-         WHERE m.id = $1`,
+        `
+        SELECT m.*, 
+              father.name AS parent_name,
+              father.spouse_nm AS mother_name
+        FROM family_members m
+        LEFT JOIN family_members father ON m.parent_id = father.id
+        WHERE m.id = $1
+        `,
         [id]
       );
 

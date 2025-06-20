@@ -100,7 +100,7 @@ export default function ModalNew({ onClose, onCreated }) {
           />
 
           <ParentSelector
-            label="손가 성명"
+            label="부 성명"
             value={parentNameInput}
             onInputChange={(e) => {
               setParentNameInput(e.target.value);
@@ -115,7 +115,7 @@ export default function ModalNew({ onClose, onCreated }) {
           />
 
           <FormField
-            label="세대"
+            label="대"
             name="generation"
             value={formData.generation}
             onChange={handleChange}

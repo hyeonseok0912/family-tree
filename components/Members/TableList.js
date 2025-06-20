@@ -18,8 +18,13 @@ export default function TableList({
 }) {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [itemsPerPage, setItemsPerPage] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth <= 600 ? 5 : 10;
+    }
+    return 10; // SSR 대응
+  });
 
   useEffect(() => {
     if (showLoginModal) return;
@@ -58,6 +63,8 @@ export default function TableList({
     setSelectedMember(updated);
   };
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 600;
+
   return (
     <>
       {loading ? (
@@ -67,41 +74,94 @@ export default function TableList({
           <div className={styles.tableWrapper}>
             <h2>📜 손씨 가계도 구성원 목록</h2>
             <br />
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>이름</th>
-                  <th>성별</th>
-                  <th>출생</th>
-                  <th>세대</th>
-                  <th>족보 보기</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentMembers.length === 0 ? (
+
+            {/* ✅ 데스크톱 테이블 */}
+            {!isMobile && (
+              <table className={styles.table}>
+                <thead>
                   <tr>
-                    <td
-                      colSpan="5"
-                      style={{ textAlign: "center", padding: "20px" }}
-                    >
-                      조건에 맞는 구성원이 없습니다.
-                    </td>
+                    <th>이름</th>
+                    <th>성별</th>
+                    <th>출생</th>
+                    <th>세대</th>
+                    <th>족보 보기</th>
                   </tr>
+                </thead>
+                <tbody>
+                  {currentMembers.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        style={{ textAlign: "center", padding: "20px" }}
+                      >
+                        조건에 맞는 구성원이 없습니다.
+                      </td>
+                    </tr>
+                  ) : (
+                    currentMembers.map((m) => (
+                      <tr key={m.id}>
+                        <td>
+                          <button
+                            onClick={() => setSelectedMember(m)}
+                            className={styles.nameBtn}
+                          >
+                            {m.name}
+                          </button>
+                        </td>
+                        <td>{formatGender(m.gender)}</td>
+                        <td>{m.birth_date}</td>
+                        <td>{m.generation}</td>
+                        <td>
+                          <button
+                            onClick={() => {
+                              setFocusId(m.id);
+                              setActiveTab("tree");
+                            }}
+                            className={styles.nameBtn}
+                          >
+                            족보 이동
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            )}
+
+            {/* ✅ 모바일 카드뷰 */}
+            {isMobile && (
+              <div className={styles.cardView}>
+                {currentMembers.length === 0 ? (
+                  <div className={styles.loading}>
+                    조건에 맞는 구성원이 없습니다.
+                  </div>
                 ) : (
                   currentMembers.map((m) => (
-                    <tr key={m.id}>
-                      <td>
+                    <div className={styles.cardItem} key={m.id}>
+                      <div className="row">
+                        <span className={styles.label}>이름</span>{" "}
                         <button
                           onClick={() => setSelectedMember(m)}
                           className={styles.nameBtn}
                         >
                           {m.name}
                         </button>
-                      </td>
-                      <td>{formatGender(m.gender)}</td>
-                      <td>{m.birth_date}</td>
-                      <td>{m.generation}</td>
-                      <td>
+                      </div>
+                      <div className="row">
+                        <span className={styles.label}>성별</span>{" "}
+                        {formatGender(m.gender)}
+                      </div>
+                      <div className="row">
+                        <span className={styles.label}>출생</span>{" "}
+                        {m.birth_date}
+                      </div>
+                      <div className="row">
+                        <span className={styles.label}>세대</span>{" "}
+                        {m.generation}
+                      </div>
+                      <div className="row">
+                        <span className={styles.label}>족보</span>{" "}
                         <button
                           onClick={() => {
                             setFocusId(m.id);
@@ -111,12 +171,12 @@ export default function TableList({
                         >
                           족보 이동
                         </button>
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
                   ))
                 )}
-              </tbody>
-            </table>
+              </div>
+            )}
           </div>
 
           <Pagination
@@ -131,7 +191,7 @@ export default function TableList({
             <ModalDetail
               member={selectedMember}
               onClose={() => setSelectedMember(null)}
-              onUpdated={handleMemberUpdate}
+              onUpdated={() => {}}
               isAdmin={isAdmin}
             />
           )}

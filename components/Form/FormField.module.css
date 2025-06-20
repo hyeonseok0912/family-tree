@@ -38,5 +38,23 @@
   background-color: #f0f0f0;
   color: #888;
   cursor: not-allowed;
-  pointer-events: none; /* 입력도 못하게 막음 */
+  pointer-events: none;
+}
+
+/* ✅ 반응형 대응 */
+@media (max-width: 600px) {
+  .label {
+    font-size: 14px;
+  }
+
+  .label input,
+  .label textarea {
+    font-size: 14px;
+    padding: 0.5rem;
+  }
+
+  .textarea {
+    font-size: 13px;
+    padding: 0.5rem;
+  }
 }
