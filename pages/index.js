@@ -6,6 +6,7 @@ import TreeView from "@/components/Tree/TreeView";
 import AdminLoginModal from "@/components/Modal/AdminLoginModal";
 import AdminMemoTab from "@/components/Admin/AdminMemoTab";
 import styles from "./TabView.module.css";
+import Head from "next/head";
 
 export default function Home() {
   const [members, setMembers] = useState([]);
@@ -36,6 +37,15 @@ export default function Home() {
 
   return (
     <main>
+      <Head>
+        <title>밀성 손씨 족보</title>
+        <meta name="description" content="밀성 손씨 가계도 및 족보를 정리한 웹사이트입니다." />
+        <meta name="keywords" content="밀성손씨, 밀양손씨, 족보, 가계도, 족보사이트" />
+        <meta name="author" content="밀성 손씨" />
+        <meta property="og:title" content="밀성 손씨 족보" />
+        <meta property="og:description" content="우리 가문의 족보를 확인해보세요." />
+        <meta property="og:type" content="website" />
+      </Head>
       <header className={styles.header}>
         <h1>밀성 손씨 족보</h1>
         <div className={styles.loginBox}>
