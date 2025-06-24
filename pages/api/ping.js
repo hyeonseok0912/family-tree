@@ -1,3 +1,8 @@
 export default function handler(req, res) {
-    res.status(200).send("pong");
-  }
+  const now = new Date().toISOString();
+  res.status(200).json({
+    message: "pong",
+    timestamp: now,
+    uptime: process.uptime(),
+  });
+}
