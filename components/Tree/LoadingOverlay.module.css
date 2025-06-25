@@ -31,7 +31,7 @@
   line-height: 1.6;
 }
 
-/* 📱 모바일 대응 */
+/* 모바일 대응 */
 @media (max-width: 600px) {
   .spinner {
     width: 40px;

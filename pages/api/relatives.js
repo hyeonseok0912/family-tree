@@ -1,14 +1,15 @@
-import pool from "../../server/db_pg";
-
 export default async function handler(req, res) {
-  const { memberId, parentId } = req.query;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method Not Allowed" });
+  }
+
+  const { memberId, parentId } = req.body;
 
   try {
     let siblings = [];
     let children = [];
 
-    // 형제 쿼리는 parentId가 null이 아닐 때만 수행
-    if (parentId !== "null" && parentId !== null && parentId !== undefined) {
+    if (parentId !== null && parentId !== undefined) {
       const siblingsQuery = `
         SELECT * FROM family_members
         WHERE parent_id = $1 AND id != $2
@@ -21,7 +22,6 @@ export default async function handler(req, res) {
       siblings = siblingsResult.rows;
     }
 
-    // 자식은 무조건 조회 가능
     const childrenQuery = `
       SELECT * FROM family_members
       WHERE parent_id = $1

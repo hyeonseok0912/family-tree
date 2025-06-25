@@ -35,7 +35,8 @@ export default function ParentSelector({
                 onSelect(p);
               }}
             >
-              {p.name} ({p.birth_date || "?"})
+              {p.name}
+              {p.hanja && `(${p.hanja})`} - ({p.birth_date || "?"})
             </li>
           ))}
         </ul>

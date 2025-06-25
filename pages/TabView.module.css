@@ -3,7 +3,7 @@
   justify-content: flex-start;
   flex-wrap: wrap;
   margin: 1rem 0;
-  padding: 0 1rem; /* ✅ 오타 수정 */
+  padding: 0 1rem;
   gap: 0.5rem;
 }
 
@@ -17,8 +17,6 @@
   color: #333;
   cursor: pointer;
   transition: background-color 0.3s ease;
-
-  /* ✅ 추가된 속성 */
   flex-shrink: 1;
   white-space: nowrap;
   min-width: fit-content;
@@ -113,7 +111,7 @@
   line-height: 1.6;
 }
 
-/* ✅ 모바일 대응 */
+/* 모바일 대응 */
 @media (max-width: 600px) {
   .tabWrapper {
     justify-content: center;
@@ -167,7 +165,7 @@
   }
 
   .lineBreak {
-    display: block; /* 줄바꿈 유지 */
+    display: block;
   }
 }
 

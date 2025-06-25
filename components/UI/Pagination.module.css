@@ -10,7 +10,6 @@
   text-align: center;
 }
 
-/* 상단 줄: 항목 수 + 네비게이션 */
 .controlRow {
   display: flex;
   flex-wrap: wrap;
@@ -30,7 +29,6 @@
   text-align: center;
 }
 
-/* 페이지 번호 줄 */
 .pageRow {
   display: flex;
   flex-wrap: wrap;
@@ -73,7 +71,7 @@
   pointer-events: none;
 }
 
-/* 📱 모바일 대응 */
+/* 모바일 대응 */
 @media (max-width: 600px) {
   .select {
     font-size: 0.85rem;

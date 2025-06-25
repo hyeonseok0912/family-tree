@@ -24,7 +24,7 @@
   background-color: rgba(0, 110, 255, 0.658);
 }
 
-/* 📱 모바일 대응 */
+/* 모바일 대응 */
 @media (max-width: 600px) {
   .zoomControls {
     top: 8px;

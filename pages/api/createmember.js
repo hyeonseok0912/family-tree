@@ -1,4 +1,4 @@
-import pool from "../../server/db_pg"; // ← pg.Pool 인스턴스
+import pool from "../../server/db_pg";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -7,6 +7,7 @@ export default async function handler(req, res) {
 
   const {
     name,
+    hanja,
     gender,
     birth_date,
     death_date,
@@ -20,13 +21,14 @@ export default async function handler(req, res) {
     // INSERT 쿼리 (PostgreSQL은 RETURNING 사용)
     const insertQuery = `
       INSERT INTO family_members 
-      (name, gender, birth_date, death_date, generation, parent_id, spouse_nm, notes)
+      (name, hanja, gender, birth_date, death_date, generation, parent_id, spouse_nm, notes)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `;
 
     const values = [
       name,
+      hanja,
       gender,
       birth_date,
       death_date,

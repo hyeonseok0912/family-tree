@@ -41,7 +41,7 @@
   pointer-events: none;
 }
 
-/* ✅ 반응형 대응 */
+/* 반응형 대응 */
 @media (max-width: 600px) {
   .label {
     font-size: 14px;

@@ -30,7 +30,7 @@
   transition: all 0.3s ease;
 }
 
-/* 📱 모바일 대응 */
+/* 모바일 대응 */
 @media (max-width: 600px) {
   .orgNode {
     font-size: 0.85rem;

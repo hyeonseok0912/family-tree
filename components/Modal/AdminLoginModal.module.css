@@ -67,7 +67,7 @@
   background-color: #aaa;
 }
 
-/* ✅ 모바일 대응 개선 */
+/* 모바일 대응 개선 */
 @media (max-width: 600px) {
   .modal {
     padding: 1rem;

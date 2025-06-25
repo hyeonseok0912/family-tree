@@ -46,7 +46,7 @@
   color: #555;
 }
 
-/* ✅ 모바일 반응형 카드 뷰 추가 */
+/* 모바일 반응형 카드 뷰 추가 */
 @media (max-width: 600px) {
   .table {
     display: none;

@@ -9,37 +9,34 @@ export default function ChartRenderer({ members, highlightedId, chartEvents }) {
     const data = [
       [
         {
-          v: "Root",
+          v: ROOT_NODE_ID,
           f: "족보<div style='color:red; font-style:italic'>시작</div>",
         },
         "",
         "",
       ],
     ];
-
+  
     members.forEach((member) => {
-  const ROOT_NODE_ID = "Root";
-  const parent = member.parent_id ? member.parent_id.toString() : ROOT_NODE_ID;
+      const parent = member.parent_id ? member.parent_id.toString() : ROOT_NODE_ID;
       const isHighlighted = highlightedId?.toString() === member.id.toString();
-
+  
       const node = {
         v: member.id.toString(),
         f: `
-          <div data-id="${member.id}" class="${
-          isHighlighted ? styles.highlightnode : ""
-        }">
-            ${member.name}
-            <div style="color:blue; font-style:italic">${
-              member.generation
-            }세대</div>
-          </div>`,
+          <div data-id="${member.id}" class="${isHighlighted ? styles.highlightnode : ""}" style="text-align: center;">
+            <div>${member.name}</div>
+            ${member.hanja ? `<div>(${member.hanja})</div>` : ""}
+            <div style="color:blue; font-style:italic;">${member.generation}대</div>
+          </div>
+        `,
       };
-
+  
       data.push([node, parent, ""]);
     });
-
+  
     return data;
-  }, [members, highlightedId]);
+  }, [members, highlightedId]);  
 
   return (
     <Chart

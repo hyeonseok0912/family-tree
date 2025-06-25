@@ -51,7 +51,7 @@
   background-color: #f0f0f0;
 }
 
-/* ✅ 반응형 대응 */
+/* 반응형 대응 */
 @media (max-width: 600px) {
   .label {
     font-size: 14px;

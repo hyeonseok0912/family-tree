@@ -7,6 +7,8 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  overflow-y: visible;
+  height: auto;
   overscroll-behavior: none;
   font-size: 16px;
   line-height: 1.5;
@@ -28,7 +30,6 @@ a {
   text-decoration: none;
 }
 
-/* ✅ 이미지, 영상 요소 반응형 대응 */
 img,
 iframe,
 video {
@@ -37,7 +38,6 @@ video {
   display: block;
 }
 
-/* ✅ 버튼 및 폼 요소 기본 스타일 상속 및 리셋 */
 button,
 input,
 select,
@@ -51,7 +51,6 @@ textarea {
   outline: none;
 }
 
-/* ✅ 스크롤바 숨김 (모바일 UX 개선) */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -66,7 +65,6 @@ textarea {
   background: transparent;
 }
 
-/* ✅ 반응형 폰트 크기 조정 */
 @media (max-width: 600px) {
   body {
     font-size: 15px;

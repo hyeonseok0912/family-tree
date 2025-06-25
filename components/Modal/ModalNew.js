@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 
 const initialData = {
   name: "",
+  hanja: "",
   gender: "M",
   birth_date: "",
   death_date: "",
@@ -70,6 +71,12 @@ export default function ModalNew({ onClose, onCreated }) {
             value={formData.name}
             onChange={handleChange}
             required
+          />
+          <FormField
+            label="한자"
+            name="hanja"
+            value={formData.hanja}
+            onChange={handleChange}
           />
           <FormField
             label="성별"

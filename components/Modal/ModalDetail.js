@@ -14,7 +14,11 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
 
   useEffect(() => {
     if (member?.id) {
-      fetch(`/api/member?id=${member.id}`)
+      fetch("/api/member", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: member.id }),
+      })
         .then((res) => res.json())
         .then((data) => {
           setLocalMember(data);
@@ -27,9 +31,14 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
 
   const fetchRelatives = async () => {
     try {
-      const res = await fetch(
-        `/api/relatives?memberId=${localMember.id}&parentId=${localMember.parent_id}`
-      );
+      const res = await fetch("/api/relatives", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          memberId: localMember.id,
+          parentId: localMember.parent_id,
+        }),
+      });
       const data = await res.json();
       setRelatives(data);
     } catch (err) {
@@ -60,7 +69,11 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
     if (!confirm.isConfirmed) return;
 
     try {
-      const res = await fetch(`/api/member?id=${id}`);
+      const res = await fetch("/api/member", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
       const next = await res.json();
       if (next) {
         setHistoryStack((prev) => [...prev, localMember]);
@@ -101,10 +114,7 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
-      <div
-        className={styles.modal}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <button className={styles.closeBtn} onClick={onClose}>
           ✖
         </button>
@@ -126,6 +136,10 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
             <tr>
               <th>이름</th>
               <td className={styles.notesCell}>{localMember.name}</td>
+            </tr>
+            <tr>
+              <th>한자</th>
+              <td className={styles.notesCell}>{localMember.hanja || "-"}</td>
             </tr>
             <tr>
               <th>성별</th>

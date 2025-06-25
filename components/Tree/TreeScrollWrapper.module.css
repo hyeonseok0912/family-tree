@@ -1,9 +1,17 @@
-.treeContainer {
-  overflow: auto;
-  width: 100%;
+.treeWrapper {
   position: relative;
-  user-select: none;
-  touch-action: pan-x pan-y; /* ✅ 모바일 스크롤 지원 */
+  overflow: visible; 
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  height: auto; 
+}
+
+.treeContainer {
+  overflow: auto;     
+  max-height: 80vh;  
+  position: relative;
+  width: 100%;
 }
 
 .innerZoomContainer {
@@ -13,9 +21,12 @@
   transition: transform 0.2s ease-in-out;
 }
 
-/* 모바일 대응 */
 @media (max-width: 600px) {
   .innerZoomContainer {
-    min-width: 600px; /* ✅ 모바일에서 너무 큰 초기 폭 조정 */
+    min-width: 600px;
+  }
+
+  .treeContainer {
+    max-height: 60vh;
   }
 }

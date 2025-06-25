@@ -62,6 +62,12 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
             required
           />
           <FormField
+            label="한자"
+            name="hanja"
+            value={formData.hanja}
+            onChange={handleChange}
+          />
+          <FormField
             label="성별"
             name="gender"
             value={formData.gender}

@@ -45,7 +45,7 @@
   background: #c9302c;
 }
 
-/* ✅ 반응형 대응 */
+/* 반응형 대응 */
 @media (max-width: 600px) {
   .memoContainer {
     padding: 1rem;

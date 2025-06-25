@@ -12,7 +12,7 @@ export default function TreeScrollWrapper({
   setHighlightedId,
   setLoading,
   setSelectedMember,
-  isDragging, 
+  isDragging,
 }) {
   const dragStart = useRef({ x: 0, y: 0 });
   const scrollStart = useRef({ left: 0, top: 0 });
@@ -95,11 +95,13 @@ export default function TreeScrollWrapper({
 
             const centerX =
               rect.left +
-              rect.width / 2 - containerRect.left +
+              rect.width / 2 -
+              containerRect.left +
               container.scrollLeft;
             const centerY =
               rect.top +
-              rect.height / 2 - containerRect.top +
+              rect.height / 2 -
+              containerRect.top +
               container.scrollTop;
 
             container.scrollTo({
@@ -107,6 +109,20 @@ export default function TreeScrollWrapper({
               top: centerY - container.clientHeight / 2,
               behavior: "smooth",
             });
+
+            setTimeout(() => {
+              const containerRect = container.getBoundingClientRect();
+              const scrollToY =
+                window.scrollY +
+                containerRect.top +
+                container.clientHeight / 2 -
+                window.innerHeight / 2;
+
+              window.scrollTo({
+                top: scrollToY,
+                behavior: "smooth",
+              });
+            }, 100);
 
             setHighlightedId(focusId);
             clearFocusId?.();

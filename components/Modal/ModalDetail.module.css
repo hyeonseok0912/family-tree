@@ -156,7 +156,7 @@
   margin-bottom: 6px;
 }
 
-/* ✅ 모바일 반응형 대응 */
+/* 모바일 반응형 대응 */
 @media (max-width: 600px) {
   .modal {
     width: 95%;

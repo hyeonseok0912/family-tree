@@ -1,7 +1,11 @@
 import pool from "../../server/db_pg";
 
 export default async function handler(req, res) {
-  const { name, startYear, endYear, sort } = req.query;
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method Not Allowed" });
+  }
+
+  const { name, startYear, endYear, sort } = req.body;
 
   try {
     let query = `
@@ -22,22 +26,31 @@ export default async function handler(req, res) {
 
     if (startYear && endYear) {
       values.push(startYear, endYear);
-      conditions.push(`CAST(LEFT(f.birth_date, 4) AS INTEGER) BETWEEN $${values.length - 1} AND $${values.length}`);
+      conditions.push(
+        `CAST(LEFT(f.birth_date, 4) AS INTEGER) BETWEEN $${
+          values.length - 1
+        } AND $${values.length}`
+      );
     } else if (startYear) {
       values.push(startYear);
-      conditions.push(`CAST(LEFT(f.birth_date, 4) AS INTEGER) >= $${values.length}`);
+      conditions.push(
+        `CAST(LEFT(f.birth_date, 4) AS INTEGER) >= $${values.length}`
+      );
     } else if (endYear) {
       values.push(endYear);
-      conditions.push(`CAST(LEFT(f.birth_date, 4) AS INTEGER) <= $${values.length}`);
+      conditions.push(
+        `CAST(LEFT(f.birth_date, 4) AS INTEGER) <= $${values.length}`
+      );
     }
 
     if (conditions.length > 0) {
       query += " WHERE " + conditions.join(" AND ");
     }
 
-    query += sort === "asc"
-      ? " ORDER BY f.generation ASC, f.birth_date DESC, f.id ASC"
-      : " ORDER BY f.generation DESC, f.birth_date DESC, f.id ASC";
+    query +=
+      sort === "asc"
+        ? " ORDER BY f.generation ASC, f.birth_date DESC, f.id ASC"
+        : " ORDER BY f.generation DESC, f.birth_date DESC, f.id ASC";
 
     const result = await pool.query(query, values);
     res.status(200).json(result.rows);
