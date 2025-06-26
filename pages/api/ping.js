@@ -3,7 +3,7 @@ import pool from "@/server/db_pg"; // PostgreSQL 연결
 export default async function handler(req, res) {
   const MAX_RETRIES = 5;
   const RETRY_DELAY_MS = 1000;
-  const targetUrl = "https://miryangson.onrender.com/";
+  const targetUrl = "https://milseongson.onrender.com/";
 
   let attempt = 1;
   let success = false;
