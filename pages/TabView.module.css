@@ -1,3 +1,8 @@
+/* =====================
+   공통 스타일
+===================== */
+
+/* 탭 */
 .tabWrapper {
   display: flex;
   justify-content: flex-start;
@@ -36,6 +41,7 @@
   border-radius: 8px 8px 0 0;
 }
 
+/* 콘텐츠 박스 */
 .contentBox {
   border: 2px solid #ccc;
   padding: 0 2rem 2rem 2rem;
@@ -45,6 +51,7 @@
   background: #fff;
 }
 
+/* 생성 버튼 */
 .createButton {
   position: fixed;
   bottom: 2rem;
@@ -64,14 +71,46 @@
   background-color: #0056b3;
 }
 
+/* 푸터 */
+.footer {
+  margin-top: 2rem;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: bolder;
+  color: #666;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+  line-height: 1.6;
+}
+
+/* =====================
+   헤더 및 로그인 영역
+===================== */
+
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 1.5rem 2rem 1rem;
   background-color: #f4f4f4;
   border-bottom: 1px solid #ccc;
   flex-wrap: wrap;
+  position: relative;
+  font-size: larger;
+  font-weight: bold;
+}
+
+.centerWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.titleBox {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #000;
 }
 
 .loginBox {
@@ -99,19 +138,10 @@
   background-color: #0056b3;
 }
 
-.footer {
-  margin-top: 2rem;
-  padding: 1rem;
-  text-align: center;
-  font-size: 0.95rem;
-  font-weight: bolder;
-  color: #666;
-  background-color: #f9f9f9;
-  border-top: 1px solid #ddd;
-  line-height: 1.6;
-}
+/* =====================
+   반응형 (모바일 < 600px)
+===================== */
 
-/* 모바일 대응 */
 @media (max-width: 600px) {
   .tabWrapper {
     justify-content: center;
@@ -140,15 +170,25 @@
 
   .header {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
     padding: 1rem;
+  }
+
+  .titleBox {
+    text-align: center;
+    width: 100%;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
   }
 
   .loginBox {
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-end;
     width: 100%;
+    margin-top: 0.2rem;
   }
 
   .loginBox span {
@@ -165,11 +205,31 @@
   }
 
   .lineBreak {
-    display: block;
+    display: inline;
   }
 }
 
+/* =====================
+   반응형 (PC ≥ 601px)
+===================== */
+
 @media (min-width: 601px) {
+  .loginBox {
+    position: absolute;
+    top: 50%;
+    right: 2rem;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .titleBox {
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
   .lineBreak {
     display: none;
   }

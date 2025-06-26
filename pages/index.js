@@ -38,16 +38,32 @@ export default function Home() {
   return (
     <main>
       <Head>
-        <title>밀성 손씨 족보</title>
-        <meta name="description" content="밀성 손씨 가계도 및 족보를 정리한 웹사이트입니다." />
-        <meta name="keywords" content="밀성손씨, 밀양손씨, 족보, 가계도, 족보사이트" />
+        <title>밀성 손씨 세보</title>
+        <meta
+          name="description"
+          content="밀성 손씨 가계도 및 족보를 정리한 웹사이트입니다."
+        />
+        <meta
+          name="keywords"
+          content="밀성손씨, 밀양손씨, 족보, 가계도, 족보사이트"
+        />
         <meta name="author" content="밀성 손씨" />
         <meta property="og:title" content="밀성 손씨 족보" />
-        <meta property="og:description" content="우리 가문의 족보를 확인해보세요." />
+        <meta
+          property="og:description"
+          content="우리 가문의 족보를 확인해보세요."
+        />
         <meta property="og:type" content="website" />
       </Head>
       <header className={styles.header}>
-        <h1>밀성 손씨 족보</h1>
+        <div className={styles.centerWrapper}>
+          <div className={styles.titleBox}>
+            <span className={styles.chinese}>密城孫氏 校洞派 世譜</span>
+            <span className={styles.lineBreak} />
+            <br className={styles.lineBreak} />
+            <span className={styles.korean}>(밀성손씨 교동파 세보)</span>
+          </div>
+        </div>
         <div className={styles.loginBox}>
           {isAdmin ? (
             <>
@@ -151,8 +167,7 @@ export default function Home() {
       )}
 
       <footer className={styles.footer}>
-        시스템 문제 발생 및 건의시{" "}
-        <br className={styles.lineBreak} />
+        시스템 문제 발생 및 건의시 <br className={styles.lineBreak} />
         010 - 3531 - 2948로 연락주세요.
       </footer>
     </main>

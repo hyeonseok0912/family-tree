@@ -27,7 +27,7 @@ export default function ChartRenderer({ members, highlightedId, chartEvents }) {
           <div data-id="${member.id}" class="${isHighlighted ? styles.highlightnode : ""}" style="text-align: center;">
             <div>${member.name}</div>
             ${member.hanja ? `<div>(${member.hanja})</div>` : ""}
-            <div style="color:blue; font-style:italic;">${member.generation}대</div>
+            <div style="color:blue; font-style:italic;">${member.generation}세</div>
           </div>
         `,
       };

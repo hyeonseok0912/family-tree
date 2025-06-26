@@ -160,7 +160,7 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
               </td>
             </tr>
             <tr>
-              <th>세대</th>
+              <th>세</th>
               <td className={styles.notesCell}>{localMember.generation}</td>
             </tr>
             <tr>

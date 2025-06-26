@@ -26,10 +26,14 @@ export default function TreeView({
 
   useEffect(() => {
     setLoading(true);
-
+  
     const fetchMembers = async () => {
       try {
-        const res = await fetch("/api/tablelist?sort=asc");
+        const res = await fetch("/api/tablelist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sort: "asc" }),
+        });
         const data = await res.json();
         setMembers(data);
         setLoading(false);
@@ -38,6 +42,7 @@ export default function TreeView({
         setLoading(false);
       }
     };
+  
     fetchMembers();
   }, []);
 
