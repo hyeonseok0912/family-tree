@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { getParentLabel, filterMembersByName } from "../../utils/helpers";
 
-export default function useParentSelection(setFormData, initialParentId = null) {
+export default function useParentSelection(
+  setFormData,
+  initialParentId = null
+) {
   const [parentOptions, setParentOptions] = useState([]);
   const [parentNameInput, setParentNameInput] = useState("");
   const [showParentDropdown, setShowParentDropdown] = useState(false);
@@ -9,9 +12,14 @@ export default function useParentSelection(setFormData, initialParentId = null) 
   useEffect(() => {
     const fetchParents = async () => {
       try {
-        const res = await fetch("/api/tablelist?sort=asc");
+        const res = await fetch("/api/tablelist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sort: "asc" }),
+        });
         const data = await res.json();
-        setParentOptions(data);
+
+        setParentOptions(Array.isArray(data) ? data : []);
 
         if (initialParentId) {
           const selectedParent = data.find((m) => m.id === initialParentId);

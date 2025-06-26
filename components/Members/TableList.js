@@ -5,6 +5,7 @@ import ModalDetail from "../Modal/ModalDetail";
 import { fetchAllMembers } from "../../utils/api";
 import { formatGender } from "../../utils/helpers";
 import LoadingOverlay from "../Tree/LoadingOverlay";
+import { formatDate } from "../../utils/helpers";
 
 export default function TableList({
   searchQuery,
@@ -109,7 +110,7 @@ export default function TableList({
                           </button>
                         </td>
                         <td>{formatGender(m.gender)}</td>
-                        <td>{m.birth_date}</td>
+                        <td>{formatDate(m.birth_date)}</td>
                         <td>{m.generation}</td>
                         <td>
                           <button
@@ -129,7 +130,7 @@ export default function TableList({
               </table>
             )}
 
-            {/* ✅ 모바일 카드뷰 */}
+            {/* 모바일 카드뷰 */}
             {isMobile && (
               <div className={styles.cardView}>
                 {currentMembers.length === 0 ? (
