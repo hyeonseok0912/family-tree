@@ -70,6 +70,7 @@ export default function ModalNew({ onClose, onCreated }) {
             name="name"
             value={formData.name}
             onChange={handleChange}
+            maxLength={20}
             required
           />
           <FormField
@@ -77,6 +78,7 @@ export default function ModalNew({ onClose, onCreated }) {
             name="hanja"
             value={formData.hanja}
             onChange={handleChange}
+            maxLength={20}
           />
           <FormField
             label="성별"
@@ -134,6 +136,7 @@ export default function ModalNew({ onClose, onCreated }) {
             name="spouse_nm"
             value={formData.spouse_nm || ""}
             onChange={handleChange}
+            maxLength={20}
           />
           <FormField
             label="비고"

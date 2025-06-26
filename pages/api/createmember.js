@@ -1,5 +1,9 @@
 import pool from "../../server/db_pg";
 
+function sanitizeDate(value) {
+  return value === "" ? null : value;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
@@ -18,11 +22,10 @@ export default async function handler(req, res) {
   } = req.body;
 
   try {
-    // INSERT 쿼리 (PostgreSQL은 RETURNING 사용)
     const insertQuery = `
       INSERT INTO family_members 
       (name, hanja, gender, birth_date, death_date, generation, parent_id, spouse_nm, notes)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `;
 
@@ -30,8 +33,8 @@ export default async function handler(req, res) {
       name,
       hanja,
       gender,
-      birth_date,
-      death_date,
+      sanitizeDate(birth_date),
+      sanitizeDate(death_date),
       generation,
       parent_id,
       spouse_nm,

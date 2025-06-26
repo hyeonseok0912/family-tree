@@ -59,6 +59,7 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
             name="name"
             value={formData.name}
             onChange={handleChange}
+            maxLength={20}
             required
           />
           <FormField
@@ -66,6 +67,7 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
             name="hanja"
             value={formData.hanja}
             onChange={handleChange}
+            maxLength={20}
           />
           <FormField
             label="성별"
@@ -121,6 +123,7 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
             name="spouse_nm"
             value={formData.spouse_nm || ""}
             onChange={handleChange}
+            maxLength={20}
           />
           <FormField
             label="비고"

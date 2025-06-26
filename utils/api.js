@@ -20,23 +20,35 @@ export const fetchMemberById = async (id) => {
   return await res.json();
 };
   
-  export const updateMember = async (data) => {
-    const res = await fetch(`/api/updatemember`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error("멤버 수정 실패");
-    return await res.json();
-  };
-  
-  export const createMember = async (data) => {
-    const res = await fetch(`/api/createmember`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error("멤버 생성 실패");
-    return await res.json();
-  };
+// 날짜 전처리
+const sanitizeDates = (data) => ({
+  ...data,
+  birth_date: data.birth_date === "" ? null : data.birth_date,
+  death_date: data.death_date === "" ? null : data.death_date,
+});
+
+// 수정
+export const updateMember = async (data) => {
+  const sanitized = sanitizeDates(data);
+  const res = await fetch(`/api/updatemember`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(sanitized),
+  });
+  if (!res.ok) throw new Error("멤버 수정 실패");
+  return await res.json();
+};
+
+// 생성
+export const createMember = async (data) => {
+  const sanitized = sanitizeDates(data);
+  const res = await fetch(`/api/createmember`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(sanitized),
+  });
+  if (!res.ok) throw new Error("멤버 생성 실패");
+  return await res.json();
+};
+
   

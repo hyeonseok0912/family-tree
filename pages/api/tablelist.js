@@ -27,20 +27,16 @@ export default async function handler(req, res) {
     if (startYear && endYear) {
       values.push(startYear, endYear);
       conditions.push(
-        `CAST(LEFT(f.birth_date, 4) AS INTEGER) BETWEEN $${
-          values.length - 1
-        } AND $${values.length}`
+        `EXTRACT(YEAR FROM f.birth_date) BETWEEN $${values.length - 1} AND $${
+          values.length
+        }`
       );
     } else if (startYear) {
       values.push(startYear);
-      conditions.push(
-        `CAST(LEFT(f.birth_date, 4) AS INTEGER) >= $${values.length}`
-      );
+      conditions.push(`EXTRACT(YEAR FROM f.birth_date) >= $${values.length}`);
     } else if (endYear) {
       values.push(endYear);
-      conditions.push(
-        `CAST(LEFT(f.birth_date, 4) AS INTEGER) <= $${values.length}`
-      );
+      conditions.push(`EXTRACT(YEAR FROM f.birth_date) <= $${values.length}`);
     }
 
     if (conditions.length > 0) {

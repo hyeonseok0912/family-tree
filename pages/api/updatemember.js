@@ -1,20 +1,32 @@
 import pool from "../../server/db_pg";
 
+function sanitizeDate(value) {
+  return value === "" ? null : value;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
   const {
-    id, hanja, name, gender, birth_date, death_date,
-    generation, parent_id, spouse_nm, notes,
+    id,
+    hanja,
+    name,
+    gender,
+    birth_date,
+    death_date,
+    generation,
+    parent_id,
+    spouse_nm,
+    notes,
   } = req.body;
 
   try {
     const result = await pool.query(
       `UPDATE family_members
        SET name = $1,
-            hanja = $2,
+           hanja = $2,
            gender = $3,
            birth_date = $4,
            death_date = $5,
@@ -23,10 +35,21 @@ export default async function handler(req, res) {
            spouse_nm = $8,
            notes = $9
        WHERE id = $10`,
-      [name, hanja, gender, birth_date, death_date, generation, parent_id, spouse_nm, notes, id]
+      [
+        name,
+        hanja,
+        gender,
+        sanitizeDate(birth_date),
+        sanitizeDate(death_date),
+        generation,
+        parent_id,
+        spouse_nm,
+        notes,
+        id,
+      ]
     );
 
-    res.status(200).json({ success: true, result });
+    res.status(200).json({ success: true });
   } catch (err) {
     console.error("DB 업데이트 실패:", err);
     res.status(500).json({ success: false, error: err.message });
