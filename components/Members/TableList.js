@@ -76,7 +76,7 @@ export default function TableList({
             <h2>📜 손씨 가계도 구성원 목록</h2>
             <br />
 
-            {/* ✅ 데스크톱 테이블 */}
+            {/* 데스크톱 테이블 */}
             {!isMobile && (
               <table className={styles.table}>
                 <thead>
@@ -155,7 +155,7 @@ export default function TableList({
                       </div>
                       <div className="row">
                         <span className={styles.label}>출생</span>{" "}
-                        {m.birth_date}
+                        {formatDate(m.birth_date)}
                       </div>
                       <div className="row">
                         <span className={styles.label}>세대</span>{" "}
