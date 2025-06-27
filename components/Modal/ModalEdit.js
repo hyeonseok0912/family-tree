@@ -114,7 +114,7 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
             label="대"
             name="generation"
             value={formData.generation}
-            onChange={handleChange}
+            // onChange={handleChange}
             required
             readOnly
           />

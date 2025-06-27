@@ -36,13 +36,14 @@ export default function useParentSelection(
   }, [initialParentId]);
 
   const handleParentSelect = (option) => {
+    const parentGen = Number(option.generation || 1);
+    const childGen = parentGen + 1;
+  
     setParentNameInput(getParentLabel(option));
     setFormData((prev) => ({
       ...prev,
       parent_id: option.id,
-      generation: option.generation
-        ? String(Number(option.generation) + 1)
-        : "1",
+      generation: String(childGen),
     }));
     setShowParentDropdown(false);
   };
