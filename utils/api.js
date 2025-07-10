@@ -19,7 +19,20 @@ export const fetchMemberById = async (id) => {
   if (!res.ok) throw new Error("멤버 조회 실패");
   return await res.json();
 };
-  
+
+// 배우자 목록 조회
+export async function fetchSpousesByMemberId(memberId) {
+  const res = await fetch("/api/getSpouses", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ member_id: memberId }),
+  });
+
+  if (!res.ok) throw new Error("배우자 정보를 불러올 수 없습니다.");
+  return res.json();
+}
+
+
 // 날짜 전처리
 const sanitizeDates = (data) => ({
   ...data,
@@ -30,7 +43,7 @@ const sanitizeDates = (data) => ({
 // 수정
 export const updateMember = async (data) => {
   const sanitized = sanitizeDates(data);
-  const res = await fetch(`/api/updatemember`, {
+  const res = await fetch(`/api/updateMember`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(sanitized),
@@ -42,7 +55,7 @@ export const updateMember = async (data) => {
 // 생성
 export const createMember = async (data) => {
   const sanitized = sanitizeDates(data);
-  const res = await fetch(`/api/createmember`, {
+  const res = await fetch(`/api/createMember`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(sanitized),
@@ -51,4 +64,3 @@ export const createMember = async (data) => {
   return await res.json();
 };
 
-  

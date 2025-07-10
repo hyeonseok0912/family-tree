@@ -9,12 +9,12 @@ export default async function handler(req, res) {
 
   try {
     let query = `
-      SELECT 
-        f.*, 
-        p.name AS parent_name 
-      FROM family_members f
-      LEFT JOIN family_members p ON f.parent_id = p.id
-    `;
+    SELECT 
+      f.*, 
+      p.name AS parent_name
+    FROM family_members f
+    LEFT JOIN family_members p ON f.parent_id = p.id
+  `;
 
     const conditions = [];
     const values = [];

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import styles from "./ModalDetail.module.css";
 import ModalEdit from "./ModalEdit";
 import { formatGender, formatDate } from "../../utils/helpers";
@@ -11,6 +11,7 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
   const [showSiblings, setShowSiblings] = useState(false);
   const [showChildren, setShowChildren] = useState(false);
   const [relatives, setRelatives] = useState({ siblings: [], children: [] });
+  const [showSpouses, setShowSpouses] = useState(false);
 
   useEffect(() => {
     if (member?.id) {
@@ -25,6 +26,10 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
           setHistoryStack([]);
           setShowSiblings(false);
           setShowChildren(false);
+        })
+        .catch((err) => {
+          console.error("상세 정보 조회 실패:", err);
+          Swal.fire("오류", "구성원 정보를 불러오지 못했습니다.", "error");
         });
     }
   }, [member]);
@@ -174,8 +179,7 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
                     >
                       {localMember.parent_name}(父)
                     </span>
-                    {localMember.mother_name &&
-                      `, ${localMember.mother_name}(母)`}
+                    {localMember.mother_nm && `, ${localMember.mother_nm}(母)`}
                   </>
                 ) : (
                   "-"
@@ -185,9 +189,40 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
             <tr>
               <th>배우자</th>
               <td className={styles.notesCell}>
-                {localMember.spouse_nm || "-"}
+                {!localMember.spouseList ||
+                localMember.spouseList.length === 0 ? (
+                  "-"
+                ) : (
+                  <div className={styles.spouseWrapper}>
+                    <div className={styles.spouseHeader}>
+                      <span>
+                        {localMember.spouseList[0].spouse_nm}
+                        {localMember.spouseList[0].spouse_nm ===
+                          localMember.mother_nm && " (母)"}
+                      </span>
+                      {localMember.spouseList.length > 1 && (
+                        <button
+                          className={styles.spouseToggleBtn}
+                          onClick={() => setShowSpouses((prev) => !prev)}
+                          type="button"
+                        >
+                          + {localMember.spouseList.length - 1}명 더보기
+                        </button>
+                      )}
+                    </div>
+
+                    {showSpouses &&
+                      localMember.spouseList.slice(1).map((s, idx) => (
+                        <div key={idx} className={styles.spouseItem}>
+                          • {s.spouse_nm}
+                          {s.spouse_nm === localMember.mother_nm && " (母)"}
+                        </div>
+                      ))}
+                  </div>
+                )}
               </td>
             </tr>
+
             <tr>
               <th>비고</th>
               <td className={styles.notesCell}>{localMember.notes || "-"}</td>

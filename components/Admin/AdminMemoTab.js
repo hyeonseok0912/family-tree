@@ -9,7 +9,7 @@ export default function AdminMemoTab() {
   useEffect(() => {
     const fetchMemo = async () => {
       try {
-        const res = await fetch("/api/adminmemo", {
+        const res = await fetch("/api/adminMemo", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "get" }),

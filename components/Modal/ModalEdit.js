@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./ModalEdit.module.css";
-import { updateMember, fetchMemberById } from "../../utils/api";
-import { isRequiredFilled } from "../../utils/helpers";
+import {
+  updateMember,
+  fetchMemberById,
+  fetchSpousesByMemberId,
+} from "../../utils/api";
+import { isRequiredFilled, sanitizeFormData } from "../../utils/helpers";
 import FormField from "../Form/FormField";
 import ParentSelector from "../Form/ParentsSelector";
 import Swal from "sweetalert2";
@@ -11,6 +15,11 @@ import useConfirmOnClose from "../hooks/useConfirmOnClose";
 export default function ModalEdit({ member, onClose, onUpdated }) {
   const initialData = { ...member };
   const [formData, setFormData] = useState(initialData);
+
+  // spouseList를 props에서 바로 초기화
+  const [spouses, setSpouses] = useState(member.spouseList || []);
+  const [newSpouse, setNewSpouse] = useState("");
+  const [motherOptions, setMotherOptions] = useState([]);
 
   const {
     parentNameInput,
@@ -28,15 +37,62 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // 부(parent_id)가 바뀌면 여성 spouse 목록 불러오기
+  useEffect(() => {
+    const fatherId = formData.parent_id;
+    console.log("✅ [useEffect] 부모 ID (fatherId):", fatherId);
+    if (fatherId) {
+      fetchSpousesByMemberId(fatherId)
+        .then((spouses) => {
+          setMotherOptions(spouses);
+          console.log("✅ [useEffect] 여성 배우자 목록:", spouses);
+        })
+        .catch(() => {
+          setMotherOptions([]);
+        });
+    } else {
+      setMotherOptions([]);
+    }
+  }, [formData.parent_id]);
+
+  const handleAddSpouse = () => {
+    const trimmed = newSpouse.trim();
+    if (!trimmed) return;
+
+    const alreadyExists = spouses.some((s) => s.spouse_nm === trimmed);
+    if (alreadyExists) return;
+
+    setSpouses((prev) => [
+      ...prev,
+      { spouse_nm: trimmed, order_no: prev.length + 1 },
+    ]);
+    setNewSpouse("");
+  };
+
+  const handleDeleteSpouse = (idx) => {
+    const updated = spouses.filter((_, i) => i !== idx);
+    const reordered = updated.map((s, i) => ({
+      ...s,
+      order_no: i + 1,
+    }));
+    setSpouses(reordered);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!isRequiredFilled(formData)) {
       Swal.fire("입력 누락", "필수 항목을 모두 입력해주세요.", "warning");
       return;
     }
 
     try {
-      const updatedMember = await updateMember(formData);
+      const payload = {
+        ...sanitizeFormData(formData),
+        spouseList: spouses,
+      };
+
+      await updateMember(payload);
       const refreshed = await fetchMemberById(formData.id);
       Swal.fire("수정 완료!", "", "success");
       onUpdated(refreshed);
@@ -53,19 +109,20 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
           ✖
         </button>
         <h2>✏️ 구성원 정보 수정</h2>
+
         <form onSubmit={handleSubmit} className={styles.editForm}>
           <FormField
             label="이름"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            maxLength={20}
             required
+            maxLength={20}
           />
           <FormField
             label="한자"
             name="hanja"
-            value={formData.hanja}
+            value={formData.hanja || ""}
             onChange={handleChange}
             maxLength={20}
           />
@@ -86,7 +143,6 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
             name="birth_date"
             value={formData.birth_date || ""}
             onChange={handleChange}
-            required
             type="date"
           />
           <FormField
@@ -111,20 +167,58 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
             placeholder="필수 입력값입니다."
           />
           <FormField
+            label="모 (선택)"
+            name="mother_nm"
+            value={formData.mother_nm || ""}
+            onChange={handleChange}
+            type="select"
+            options={[
+              { value: "", label: "선택 안함" },
+              ...motherOptions.map((m) => ({
+                value: m.name,
+                label: `${m.name})`,
+              })),
+            ]}
+          />
+          <FormField
             label="대"
             name="generation"
             value={formData.generation}
-            // onChange={handleChange}
-            required
             readOnly
+            required
           />
-          <FormField
-            label="배우자"
-            name="spouse_nm"
-            value={formData.spouse_nm || ""}
-            onChange={handleChange}
-            maxLength={20}
-          />
+
+          {/* 🔹 배우자 목록 UI */}
+          <div className={styles.spouseSection}>
+            <label>배우자 목록</label>
+            <div className={styles.spouseList}>
+              {spouses.map((s, i) => (
+                <div key={i} className={styles.spouseItem}>
+                  <span>{s.spouse_nm}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSpouse(i)}
+                    className={styles.deleteBtn}
+                  >
+                    ❌
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.spouseInputGroup}>
+              <input
+                type="text"
+                placeholder="이름 입력"
+                value={newSpouse}
+                onChange={(e) => setNewSpouse(e.target.value)}
+              />
+              <button type="button" onClick={handleAddSpouse}>
+                추가
+              </button>
+            </div>
+          </div>
+
           <FormField
             label="비고"
             name="notes"

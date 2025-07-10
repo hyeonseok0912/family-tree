@@ -2,9 +2,7 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/api/tablelist": "pages/api/tablelist.js",
-  "/api/member": "pages/api/member.js",
-  "/api/relatives": "pages/api/relatives.js",
   "/": "pages/index.js",
-  "/api/updatemember": "pages/api/updatemember.js"
+  "/api/adminMemo": "pages/api/adminMemo.js",
+  "/api/tablelist": "pages/api/tablelist.js"
 }

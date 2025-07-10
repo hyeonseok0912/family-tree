@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./ModalNew.module.css";
-import { createMember } from "../../utils/api";
-import { isRequiredFilled } from "../../utils/helpers";
+import { createMember, fetchSpousesByMemberId } from "../../utils/api";
+import { isRequiredFilled, sanitizeFormData } from "../../utils/helpers";
 import FormField from "../Form/FormField";
 import ParentSelector from "../Form/ParentsSelector";
 import useParentSelection from "../hooks/useParentSelection";
@@ -16,12 +16,14 @@ const initialData = {
   death_date: "",
   generation: "",
   parent_id: "",
-  spouse_nm: "",
+  mother_nm: "",
   notes: "",
 };
 
 export default function ModalNew({ onClose, onCreated }) {
   const [formData, setFormData] = useState({ ...initialData });
+  const [spouses, setSpouses] = useState([]);
+  const [newSpouse, setNewSpouse] = useState("");
 
   const {
     parentNameInput,
@@ -39,6 +41,54 @@ export default function ModalNew({ onClose, onCreated }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // 부 설정 시 → 첫 번째 배우자 이름을 모(mother_nm)로 자동 지정
+  useEffect(() => {
+    const fatherId = formData.parent_id;
+
+    if (!fatherId) {
+      setFormData((prev) => ({ ...prev, mother_nm: "" }));
+      return;
+    }
+
+    fetchSpousesByMemberId(fatherId)
+      .then((spouses) => {
+        const firstWife = spouses.find((s) => s.order_no === 1);
+
+        if (firstWife) {
+          setFormData((prev) => ({
+            ...prev,
+            mother_nm: firstWife.name,
+          }));
+        } else {
+          setFormData((prev) => ({ ...prev, mother_nm: "" }));
+        }
+      })
+      .catch((err) => {
+        setFormData((prev) => ({ ...prev, mother_nm: "" }));
+      });
+  }, [formData.parent_id]);
+
+  const handleAddSpouse = () => {
+    const trimmed = newSpouse.trim();
+    if (!trimmed) return;
+    if (spouses.some((s) => s.spouse_nm === trimmed)) return;
+
+    setSpouses([
+      ...spouses,
+      { spouse_nm: trimmed, order_no: spouses.length + 1 },
+    ]);
+    setNewSpouse("");
+  };
+
+  const handleDeleteSpouse = (idx) => {
+    const updated = spouses.filter((_, i) => i !== idx);
+    const reordered = updated.map((s, i) => ({
+      ...s,
+      order_no: i + 1,
+    }));
+    setSpouses(reordered);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isRequiredFilled(formData)) {
@@ -47,7 +97,11 @@ export default function ModalNew({ onClose, onCreated }) {
     }
 
     try {
-      const newMember = await createMember(formData);
+      const payload = {
+        ...sanitizeFormData(formData),
+        spouseList: spouses,
+      };
+      const newMember = await createMember(payload);
       Swal.fire("추가 완료", "구성원이 추가되었습니다!", "success");
       onCreated(newMember);
       onClose();
@@ -64,21 +118,18 @@ export default function ModalNew({ onClose, onCreated }) {
         </button>
         <h2>➕ 구성원 추가</h2>
         <form onSubmit={handleSubmit} className={styles.editForm}>
-          
           <FormField
             label="이름"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            maxLength={20}
             required
           />
           <FormField
             label="한자"
             name="hanja"
-            value={formData.hanja}
+            value={formData.hanja || ""}
             onChange={handleChange}
-            maxLength={20}
           />
           <FormField
             label="성별"
@@ -95,15 +146,14 @@ export default function ModalNew({ onClose, onCreated }) {
           <FormField
             label="출생 연도"
             name="birth_date"
-            value={formData.birth_date || ""}
+            value={formData.birth_date}
             onChange={handleChange}
-            required
             type="date"
           />
           <FormField
             label="사망 연도"
             name="death_date"
-            value={formData.death_date || ""}
+            value={formData.death_date}
             onChange={handleChange}
             type="date"
           />
@@ -123,25 +173,56 @@ export default function ModalNew({ onClose, onCreated }) {
             placeholder="필수 입력값입니다."
           />
 
+          {/* 모 정보는 자동 설정되며 readOnly */}
+          <FormField
+            label="모 (자동)"
+            name="mother_nm"
+            value={formData.mother_nm || ""}
+            readOnly
+          />
+
           <FormField
             label="대"
             name="generation"
             value={formData.generation}
-            onChange={handleChange}
-            required
             readOnly
+            required
           />
-          <FormField
-            label="배우자"
-            name="spouse_nm"
-            value={formData.spouse_nm || ""}
-            onChange={handleChange}
-            maxLength={20}
-          />
+
+          {/* 배우자 리스트 */}
+          <div className={styles.spouseSection}>
+            <label>배우자</label>
+            <div className={styles.spouseList}>
+              {spouses.map((s, i) => (
+                <div key={i} className={styles.spouseItem}>
+                  <span>{s.spouse_nm}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSpouse(i)}
+                    className={styles.deleteBtn}
+                  >
+                    ❌
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className={styles.spouseInputGroup}>
+              <input
+                type="text"
+                placeholder="이름 입력"
+                value={newSpouse}
+                onChange={(e) => setNewSpouse(e.target.value)}
+              />
+              <button type="button" onClick={handleAddSpouse}>
+                추가
+              </button>
+            </div>
+          </div>
+
           <FormField
             label="비고"
             name="notes"
-            value={formData.notes || ""}
+            value={formData.notes}
             onChange={handleChange}
             multiline
             rows={3}

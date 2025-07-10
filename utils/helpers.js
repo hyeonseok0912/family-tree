@@ -21,3 +21,15 @@ export const filterMembersByName = (members, input) =>
 
 export const isRequiredFilled = (formData) =>
   formData.name && formData.gender && formData.birth_date && formData.parent_id;
+
+export const sanitizeFormData = (data) => {
+  const sanitize = (val) => (val === "" ? null : val);
+  return {
+    ...data,
+    hanja: sanitize(data.hanja),
+    birth_date: sanitize(data.birth_date),
+    death_date: sanitize(data.death_date),
+    mother_nm: sanitize(data.mother_nm),
+    notes: sanitize(data.notes),
+  };
+};

@@ -1,7 +1,12 @@
 import pool from "../../server/db_pg";
 
-function sanitizeDate(value) {
-  return value === "" ? null : value;
+function sanitizeInput(data) {
+  const sanitized = {};
+  for (const [key, value] of Object.entries(data)) {
+    sanitized[key] =
+      typeof value === "string" && value.trim() === "" ? null : value;
+  }
+  return sanitized;
 }
 
 export default async function handler(req, res) {
@@ -17,35 +22,54 @@ export default async function handler(req, res) {
     death_date,
     generation,
     parent_id,
-    spouse_nm,
+    mother_nm,
     notes,
-  } = req.body;
+    spouseList = [],
+  } = sanitizeInput(req.body); // ✅ 여기서 한 번에 null 처리
+
+  const client = await pool.connect();
 
   try {
-    const insertQuery = `
+    await client.query("BEGIN");
+
+    const insertMemberQuery = `
       INSERT INTO family_members 
-      (name, hanja, gender, birth_date, death_date, generation, parent_id, spouse_nm, notes)
+      (name, hanja, gender, birth_date, death_date, generation, parent_id, mother_nm, notes)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `;
-
-    const values = [
+    const memberValues = [
       name,
       hanja,
       gender,
-      sanitizeDate(birth_date),
-      sanitizeDate(death_date),
+      birth_date,
+      death_date,
       generation,
       parent_id,
-      spouse_nm,
+      mother_nm,
       notes,
     ];
 
-    const result = await pool.query(insertQuery, values);
+    const memberResult = await client.query(insertMemberQuery, memberValues);
+    const newMember = memberResult.rows[0];
+    const newMemberId = newMember.id;
 
-    res.status(200).json(result.rows[0]);
+    for (const { spouse_nm, order_no } of spouseList) {
+      if (!spouse_nm?.trim()) continue; // ✅ spouse_nm 비어있으면 skip
+      await client.query(
+        `INSERT INTO spouse (husband_id, spouse_nm, order_no)
+         VALUES ($1, $2, $3)`,
+        [newMemberId, spouse_nm.trim(), order_no]
+      );
+    }
+
+    await client.query("COMMIT");
+    res.status(200).json(newMember);
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error("DB insert error:", error);
     res.status(500).json({ message: "DB error", error });
+  } finally {
+    client.release();
   }
 }
