@@ -19,7 +19,7 @@ export default function FormField({
       {type === "select" ? (
         <select
           name={name}
-          value={value}
+          value={value ?? ""}
           onChange={onChange}
           className={required ? styles.required : ""}
         >
@@ -46,7 +46,9 @@ export default function FormField({
           onChange={onChange}
           placeholder={placeholder}
           readOnly={readOnly}
-          className={`${required ? styles.required : ""} ${readOnly ? styles.readOnly : ""}`}
+          className={`${required ? styles.required : ""} ${
+            readOnly ? styles.readOnly : ""
+          }`}
         />
       )}
     </label>

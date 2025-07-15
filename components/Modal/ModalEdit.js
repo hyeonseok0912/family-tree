@@ -5,7 +5,7 @@ import {
   fetchMemberById,
   fetchSpousesByMemberId,
 } from "../../utils/api";
-import { isRequiredFilled, sanitizeFormData } from "../../utils/helpers";
+import { isRequiredFilled, sanitizeFormData, formatInputDate } from "../../utils/helpers";
 import FormField from "../Form/FormField";
 import ParentSelector from "../Form/ParentsSelector";
 import Swal from "sweetalert2";
@@ -40,12 +40,10 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
   // 부(parent_id)가 바뀌면 여성 spouse 목록 불러오기
   useEffect(() => {
     const fatherId = formData.parent_id;
-    console.log("✅ [useEffect] 부모 ID (fatherId):", fatherId);
     if (fatherId) {
       fetchSpousesByMemberId(fatherId)
         .then((spouses) => {
           setMotherOptions(spouses);
-          console.log("✅ [useEffect] 여성 배우자 목록:", spouses);
         })
         .catch(() => {
           setMotherOptions([]);
@@ -131,24 +129,24 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
             name="gender"
             value={formData.gender}
             onChange={handleChange}
-            required
             type="select"
             options={[
+              { value: "", label: "선택 안함" },
               { value: "M", label: "남" },
               { value: "F", label: "여" },
             ]}
           />
           <FormField
-            label="출생"
+            label="출생 (※ 연도를 모를 경우 1월 1일로 입력)"
             name="birth_date"
-            value={formData.birth_date || ""}
+            value={formatInputDate(formData.birth_date || "")}
             onChange={handleChange}
             type="date"
           />
           <FormField
             label="사망"
             name="death_date"
-            value={formData.death_date || ""}
+            value={formatInputDate(formData.death_date || "")}
             onChange={handleChange}
             type="date"
           />
@@ -176,7 +174,7 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
               { value: "", label: "선택 안함" },
               ...motherOptions.map((m) => ({
                 value: m.name,
-                label: `${m.name})`,
+                label: `${m.name}`,
               })),
             ]}
           />

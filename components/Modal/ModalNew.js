@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./ModalNew.module.css";
 import { createMember, fetchSpousesByMemberId } from "../../utils/api";
-import { isRequiredFilled, sanitizeFormData } from "../../utils/helpers";
+import { isRequiredFilled, sanitizeFormData, formatInputDate } from "../../utils/helpers";
 import FormField from "../Form/FormField";
 import ParentSelector from "../Form/ParentsSelector";
 import useParentSelection from "../hooks/useParentSelection";
@@ -136,24 +136,24 @@ export default function ModalNew({ onClose, onCreated }) {
             name="gender"
             value={formData.gender}
             onChange={handleChange}
-            required
             type="select"
             options={[
+              { value: "", label: "선택 안함" },
               { value: "M", label: "남" },
               { value: "F", label: "여" },
             ]}
           />
           <FormField
-            label="출생 연도"
+            label="출생 연도 (※ 연도를 모를 경우 1월 1일로 입력)"
             name="birth_date"
-            value={formData.birth_date}
+            value={formatInputDate(formData.birth_date || "")}
             onChange={handleChange}
             type="date"
           />
           <FormField
             label="사망 연도"
             name="death_date"
-            value={formData.death_date}
+            value={formatInputDate(formData.death_date || "")}
             onChange={handleChange}
             type="date"
           />

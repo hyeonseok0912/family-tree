@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     mother_nm,
     notes,
     spouseList = [],
-  } = sanitizeInput(req.body); // ✅ 여기서 한 번에 null 처리
+  } = sanitizeInput(req.body);
 
   const client = await pool.connect();
 
@@ -62,6 +62,18 @@ export default async function handler(req, res) {
         [newMemberId, spouse_nm.trim(), order_no]
       );
     }
+
+    await client.query(`
+      UPDATE family_members fm
+      SET mother_nm = s.spouse_nm
+      FROM (
+        SELECT husband_id, spouse_nm
+        FROM spouse
+        WHERE order_no = 1
+      ) s
+      WHERE fm.id = $1
+        AND fm.parent_id = s.husband_id;
+    `);
 
     await client.query("COMMIT");
     res.status(200).json(newMember);

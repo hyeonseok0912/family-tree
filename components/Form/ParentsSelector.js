@@ -1,4 +1,5 @@
 import styles from "./ParentSelector.module.css";
+import { formatDate } from "../../utils/helpers";
 
 export default function ParentSelector({
   label = "부모 성명",
@@ -36,7 +37,7 @@ export default function ParentSelector({
               }}
             >
               {p.name}
-              {p.hanja && `(${p.hanja})`} - ({p.birth_date || "?"})
+              {p.hanja && `(${p.hanja})`} - ({p.birth_date ? formatDate(p.birth_date) : "-"})
             </li>
           ))}
         </ul>
