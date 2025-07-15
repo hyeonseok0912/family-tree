@@ -3,5 +3,10 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/": "pages/index.js",
-  "/api/tablelist": "pages/api/tablelist.js"
+  "/api/tablelist": "pages/api/tablelist.js",
+  "/api/createmember": "pages/api/createmember.js",
+  "/api/member": "pages/api/member.js",
+  "/api/getspouses": "pages/api/getspouses.js",
+  "/api/relatives": "pages/api/relatives.js",
+  "/api/adminmemo": "pages/api/adminmemo.js"
 }

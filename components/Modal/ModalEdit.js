@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "./ModalEdit.module.css";
 import {
-  updateMember,
+  updatemember,
   fetchMemberById,
   fetchSpousesByMemberId,
 } from "../../utils/api";
@@ -90,7 +90,7 @@ export default function ModalEdit({ member, onClose, onUpdated }) {
         spouseList: spouses,
       };
 
-      await updateMember(payload);
+      await updatemember(payload);
       const refreshed = await fetchMemberById(formData.id);
       Swal.fire("수정 완료!", "", "success");
       onUpdated(refreshed);

@@ -73,7 +73,7 @@ export default async function handler(req, res) {
       ) s
       WHERE fm.id = $1
         AND fm.parent_id = s.husband_id;
-    `);
+    `, [newMemberId]);
 
     await client.query("COMMIT");
     res.status(200).json(newMember);

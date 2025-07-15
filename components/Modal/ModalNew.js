@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import styles from "./ModalNew.module.css";
-import { createMember, fetchSpousesByMemberId } from "../../utils/api";
+import { createmember, fetchSpousesByMemberId } from "../../utils/api";
 import { isRequiredFilled, sanitizeFormData, formatInputDate } from "../../utils/helpers";
 import FormField from "../Form/FormField";
 import ParentSelector from "../Form/ParentsSelector";
@@ -101,7 +101,7 @@ export default function ModalNew({ onClose, onCreated }) {
         ...sanitizeFormData(formData),
         spouseList: spouses,
       };
-      const newMember = await createMember(payload);
+      const newMember = await createmember(payload);
       Swal.fire("추가 완료", "구성원이 추가되었습니다!", "success");
       onCreated(newMember);
       onClose();

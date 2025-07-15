@@ -22,7 +22,7 @@ export const fetchMemberById = async (id) => {
 
 // 배우자 목록 조회
 export async function fetchSpousesByMemberId(memberId) {
-  const res = await fetch("/api/getSpouses", {
+  const res = await fetch("/api/getspouses", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ member_id: memberId }),
@@ -41,9 +41,9 @@ const sanitizeDates = (data) => ({
 });
 
 // 수정
-export const updateMember = async (data) => {
+export const updatemember = async (data) => {
   const sanitized = sanitizeDates(data);
-  const res = await fetch(`/api/updateMember`, {
+  const res = await fetch(`/api/updatemember`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(sanitized),
@@ -53,9 +53,9 @@ export const updateMember = async (data) => {
 };
 
 // 생성
-export const createMember = async (data) => {
+export const createmember = async (data) => {
   const sanitized = sanitizeDates(data);
-  const res = await fetch(`/api/createMember`, {
+  const res = await fetch(`/api/createmember`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(sanitized),
