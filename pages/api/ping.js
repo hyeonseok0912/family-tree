@@ -1,3 +1,4 @@
+// pages/api/ping-db.js
 import pool from "@/server/db_pg"; // PostgreSQL 연결
 
 export default async function handler(req, res) {
@@ -32,7 +33,7 @@ export default async function handler(req, res) {
       [success ? "success" : "fail", attempt, success ? null : lastErrorMessage]
     );
   } catch (dbErr) {
-    // DB 에러 자체는 무시하되, 나중에 필요시 로그 추가 가능
+    // DB 에러 무시 (선택적으로 나중에 파일 로그화 가능)
   }
 
   // 응답
