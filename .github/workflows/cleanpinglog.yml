@@ -1,0 +1,14 @@
+name: Weekly Clean Ping Log
+
+on:
+  schedule:
+    - cron: '0 15 * * 0'  # 매주 일요일 15:00 UTC → 월요일 00:00 KST
+  workflow_dispatch:       # 수동 실행 가능
+
+jobs:
+  clean-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clean Ping Log
+        run: curl -fsS https://milseongson.onrender.com/api/cleanpinglog
