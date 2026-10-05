@@ -30,7 +30,7 @@
   min-height: 100px;
   resize: vertical;
   padding: 8px;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.5;
 }
 
@@ -44,17 +44,17 @@
 /* 반응형 대응 */
 @media (max-width: 600px) {
   .label {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .label input,
   .label textarea {
-    font-size: 14px;
+    font-size: 16px;
     padding: 0.5rem;
   }
 
   .textarea {
-    font-size: 13px;
+    font-size: 16px;
     padding: 0.5rem;
   }
 }

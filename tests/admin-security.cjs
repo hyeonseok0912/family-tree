@@ -1,0 +1,23 @@
+const assert=require('node:assert/strict');
+const {hashPassword,verifyPassword,canManage,tokenHash}=require('../server/security.cjs');
+(async()=>{
+  const password='test-only-long-password';
+  const first=await hashPassword(password),second=await hashPassword(password);
+  assert.notEqual(first,second);
+  assert.ok(!first.includes(password));
+  assert.equal(await verifyPassword(password,first),true);
+  assert.equal(await verifyPassword('wrong',first),false);
+  assert.equal(await verifyPassword(password,'malformed'),false);
+  console.log('PASS: salted password hashes; valid/invalid/malformed verification');
+  const editor={id:7,role:'EDITOR',status:'ACTIVE',permissions:{create:true,update:true,delete:true}};
+  assert.equal(canManage(null,{created_by:7}),false);
+  assert.equal(canManage(editor,{created_by:7}),true);
+  assert.equal(canManage(editor,{created_by:8}),false);
+  assert.equal(canManage(editor,{created_by:null}),false);
+  assert.equal(canManage(editor,null,'create'),true);
+  assert.equal(canManage({...editor,status:'SUSPENDED'},{created_by:7}),false);
+  assert.equal(canManage({...editor,permissions:{update:false}},{created_by:7}),false);
+  assert.equal(canManage({...editor,role:'SUPER_ADMIN'},{created_by:null}),true);
+  assert.equal(tokenHash('test-token').length,64);
+  console.log('PASS: editor ownership, unknown owners, suspended accounts and permission switches');
+})().catch(error=>{console.error(error);process.exitCode=1;});

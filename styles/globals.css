@@ -9,7 +9,7 @@ body {
   overflow-x: hidden;
   overflow-y: visible;
   height: auto;
-  overscroll-behavior: none;
+  overscroll-behavior: auto;
   font-size: 16px;
   line-height: 1.5;
   font-family: Arial, Helvetica, sans-serif;
@@ -76,3 +76,24 @@ textarea {
     font-size: 14px;
   }
 }
+
+button { cursor:pointer; min-height:36px; }
+button:disabled { cursor:default; opacity:.55; }
+:focus-visible { outline:3px solid #1769aa; outline-offset:3px; }
+fieldset label { display:flex; flex-wrap:wrap; gap:8px; margin:6px 0; }
+fieldset input,fieldset select { border:1px solid #aaa; border-radius:4px; padding:6px; max-width:100%; }
+.install-app { max-width:1240px; margin:8px auto; padding:8px 0; }
+@media(max-width:1280px) { .install-app { margin:8px 20px; } }
+@media(max-width:600px) { .install-app { margin:8px 10px; } }
+.install-app button { background:#183b56; color:white; padding:8px 16px; border-radius:6px; }
+.install-app summary { cursor:pointer; }
+@media(max-width:600px){button{min-height:44px}input,select,textarea{font-size:16px}}
+
+.sr-only {position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+main > form { max-width:1240px; margin-left:auto; margin-right:auto; }
+input,select,textarea { max-width:100%; }
+fieldset { min-width:0; }
+fieldset input { width:100%; }
+input:focus-visible,select:focus-visible,textarea:focus-visible { outline:3px solid #1769aa; outline-offset:2px; }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; scroll-behavior:auto!important; } }

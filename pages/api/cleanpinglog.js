@@ -1,13 +1,17 @@
 import pool from "../../server/db_pg";
+import {requireOperator} from '../../server/cronAuth';
+import {sendError} from '../../server/auth';
 
 export default async function handler(req, res) {
-  if (req.method !== "GET") {
+  if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  const client = await pool.connect();
+  let client;
 
   try {
+    await requireOperator(req);
+    client=await pool.connect();
     const result = await client.query(
       `
       DELETE FROM ping_log
@@ -24,13 +28,8 @@ export default async function handler(req, res) {
       message: `${deletedCount}건의 로그가 삭제되었습니다.`,
     });
   } catch (error) {
-    console.error("ping_log 삭제 실패:", error);
-    res.status(500).json({
-      success: false,
-      message: "ping_log 삭제 중 오류 발생",
-      error: error.message,
-    });
+    return sendError(res,error);
   } finally {
-    client.release();
+    client?.release();
   }
 }

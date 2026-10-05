@@ -6,21 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint pages components server utils --ext .js",
+    "test": "node tests/run.cjs",
+    "test:db": "node tests/migration.cjs && node tests/server-integration.cjs && node tests/restore.cjs && node tests/fresh-schema.cjs",
+    "db:backup": "node scripts/database.cjs backup",
+    "db:migrate": "node scripts/database.cjs migrate",
+    "db:bootstrap": "node scripts/database.cjs bootstrap",
+    "verify:build": "node scripts/verify-build.cjs",
+    "test:http": "node tests/http-smoke.cjs"
   },
   "dependencies": {
     "html2canvas": "^1.4.1",
-    "jspdf": "^3.0.1",
-    "mysql2": "^3.14.0",
-    "next": "15.2.4",
+    "jspdf": "^4.2.1",
+    "next": "^15.5.27",
     "pg": "^8.16.0",
     "react": "^18.2.0",
     "react-datepicker": "^8.2.1",
     "react-dom": "^18.2.0",
-    "react-flow-renderer": "^10.3.17",
     "react-google-charts": "^5.2.1",
     "react-icons": "^5.5.0",
-    "reactflow": "^11.11.4",
-    "sweetalert2": "^11.17.2"
+    "sweetalert2": "^11.26.25"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.27"
+  },
+  "overrides": {
+    "postcss": "^8.5.28"
   }
 }

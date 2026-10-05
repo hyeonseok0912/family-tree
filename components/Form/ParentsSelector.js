@@ -1,4 +1,5 @@
 import styles from "./ParentSelector.module.css";
+import {useId} from 'react';
 import { formatDate } from "../../utils/helpers";
 
 export default function ParentSelector({
@@ -12,12 +13,18 @@ export default function ParentSelector({
   required = false,
   placeholder = "",
 }) {
+  const optionsId=useId();
   return (
     <div className={styles.wrapper}>
       <label className={styles.label}>
         {label}
         <input
           type="text"
+          role="combobox"
+          aria-controls={optionsId}
+          aria-expanded={!!(showDropdown&&value)}
+          aria-autocomplete="list"
+          onKeyDown={event=>{if(event.key==='Escape')setShowDropdown(false);if(event.key==='ArrowDown'){event.preventDefault();event.currentTarget.parentElement.parentElement.querySelector('button')?.focus();}}}
           value={value}
           onChange={onInputChange}
           onFocus={() => setShowDropdown(true)}
@@ -28,17 +35,12 @@ export default function ParentSelector({
       </label>
 
       {showDropdown && value && (
-        <ul className={styles.dropdown}>
+        <ul id={optionsId} className={styles.dropdown}>
           {options.map((p) => (
-            <li
-              key={p.id}
-              onClick={() => {
-                onSelect(p);
-              }}
-            >
+            <li key={p.id}><button type="button" onClick={()=>onSelect(p)}>
               {p.name}
               {p.hanja && `(${p.hanja})`} - ({p.birth_date ? formatDate(p.birth_date) : "-"})
-            </li>
+            </button></li>
           ))}
         </ul>
       )}

@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import treeScroll from "../../utils/treeScroll.cjs";
+import { useEffect, useRef, useState } from "react";
 import ChartRenderer from "./ChartRenderer";
 import styles from "./TreeScrollWrapper.module.css";
 
@@ -16,7 +17,15 @@ export default function TreeScrollWrapper({
 }) {
   const dragStart = useRef({ x: 0, y: 0 });
   const scrollStart = useRef({ left: 0, top: 0 });
-  const hasFocused = useRef(false);
+  const [chartReady,setChartReady]=useState(false);
+
+  useEffect(() => {
+    const container = wrapperRef.current;
+    if (!container) return;
+    const wheel = event => treeScroll.scrollTreeWheel(container, event);
+    container.addEventListener('wheel', wheel, {passive:false});
+    return () => container.removeEventListener('wheel', wheel);
+  }, [wrapperRef]);
 
   const handleMouseDown = (e) => {
     const modalElement = document.querySelector(`.${styles.modal}`);
@@ -45,47 +54,16 @@ export default function TreeScrollWrapper({
   };
 
   useEffect(() => {
-    const container = wrapperRef.current;
-    container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("mouseup", handleMouseUp);
-    container.addEventListener("mouseleave", handleMouseUp);
-    container.addEventListener("mousedown", handleMouseDown);
-
-    return () => {
-      container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("mouseup", handleMouseUp);
-      container.removeEventListener("mouseleave", handleMouseUp);
-      container.removeEventListener("mousedown", handleMouseDown);
-    };
-  }, []);
-
-  const chartEvents = [
-    {
-      eventName: "select",
-      callback: ({ chartWrapper }) => {
-        const chart = chartWrapper.getChart();
-        const selection = chart.getSelection();
-        if (selection.length > 0) {
-          setSelectedMember(members[selection[0].row]);
-        }
-      },
-    },
-    {
-      eventName: "ready",
-      callback: () => {
-        if (
-          !focusId ||
-          members.length === 0 ||
-          !wrapperRef.current ||
-          hasFocused.current
-        )
-          return;
-
-        hasFocused.current = true;
+    if (!chartReady || !focusId || !members.length || !wrapperRef.current) return;
         const container = wrapperRef.current;
         let attempt = 0;
+        let frame;
+        let pageTimer;
+        let loadingTimer;
+        let canceled = false;
 
         const tryScroll = () => {
+          if (canceled) return;
           const targetDiv = container.querySelector(
             `div[data-id="${focusId}"]`
           );
@@ -110,7 +88,7 @@ export default function TreeScrollWrapper({
               behavior: "smooth",
             });
 
-            setTimeout(() => {
+            pageTimer = setTimeout(() => {
               const containerRect = container.getBoundingClientRect();
               const scrollToY =
                 window.scrollY +
@@ -125,17 +103,37 @@ export default function TreeScrollWrapper({
             }, 100);
 
             setHighlightedId(focusId);
-            clearFocusId?.();
-            setTimeout(() => setLoading(false), 500);
+
+            loadingTimer = setTimeout(() => { setLoading(false); clearFocusId?.(); }, 500);
           } else if (attempt++ < 30) {
-            requestAnimationFrame(tryScroll);
+            frame = requestAnimationFrame(tryScroll);
           } else {
             setLoading(false);
           }
         };
 
-        setTimeout(() => requestAnimationFrame(tryScroll), 100);
+    frame = requestAnimationFrame(tryScroll);
+    return () => { canceled = true; cancelAnimationFrame(frame); clearTimeout(pageTimer); clearTimeout(loadingTimer); };
+  }, [chartReady, focusId, members, wrapperRef, clearFocusId, setHighlightedId, setLoading]);
+
+  const chartEvents = [
+    {
+      eventName: "select",
+      callback: ({ chartWrapper }) => {
+        const chart = chartWrapper.getChart();
+        const selection = chart.getSelection();
+        if (selection.length > 0) {
+          const row = selection[0].row;
+          if (row == null) return;
+          const nodeId = chartWrapper.getDataTable().getValue(row, 0);
+          const member = members.find((item) => String(item.id) === String(nodeId));
+          if (member) setSelectedMember(member);
+        }
       },
+    },
+    {
+      eventName: "ready",
+      callback: () => { setChartReady(true); },
     },
   ];
 
@@ -143,7 +141,19 @@ export default function TreeScrollWrapper({
     <div
       className={styles.treeContainer}
       ref={wrapperRef}
+      onKeyDown={event=>{
+        if(event.key!=='Enter'&&event.key!==' ')return;
+        const id=event.target.closest('[data-id]')?.dataset.id;
+        const member=members.find(item=>String(item.id)===id);
+        if(member){event.preventDefault();setSelectedMember(member);}
+      }}
       onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      tabIndex={0}
+      role="region"
+      aria-label="가계도. 방향키 또는 손가락으로 스크롤할 수 있습니다."
       style={{ userSelect: "none" }}
     >
       <div

@@ -11,4 +11,4 @@ jobs:
 
     steps:
       - name: Clean Ping Log
-        run: curl -fsS https://milseongson.onrender.com/api/cleanpinglog
+        run: curl -fsS -X POST -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" https://milseongson.onrender.com/api/cleanpinglog

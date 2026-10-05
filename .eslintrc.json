@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "next/core-web-vitals"
+  ],
+  "ignorePatterns": [
+    ".verification/**",
+    "mobile/**",
+    "backups/**",
+    ".private/**",
+    "tests/**",
+    "scripts/**"
+  ],
+  "parser": "espree",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  }
+}

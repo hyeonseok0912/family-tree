@@ -96,3 +96,5 @@
     flex-wrap: wrap;
   }
 }
+.pageRow button, .controlRow button { min-width:44px; }
+.activePage { background-color:#183b56!important; box-shadow:none; }

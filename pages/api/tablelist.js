@@ -5,18 +5,20 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  const { name, startYear, endYear, sort } = req.body;
+  const { name, startYear, endYear, sort } = req.body || {};
+  const validYear = value => !value || (/^\d{1,4}$/.test(String(value)) && Number(value)>=1 && Number(value)<=9999);
+  if ((name && (typeof name!=="string" || name.length>80)) || !validYear(startYear) || !validYear(endYear) || (startYear && endYear && Number(startYear)>Number(endYear))) return res.status(400).json({message:"검색 이름 또는 연도 범위를 확인해주세요."});
 
   try {
     let query = `
-    SELECT 
-      f.*, 
+    SELECT
+      f.id,f.name,f.hanja,f.gender,f.birth_date,f.birth_date_precision,f.death_date,f.death_date_precision,f.generation,f.parent_id,
       p.name AS parent_name
     FROM family_members f
     LEFT JOIN family_members p ON f.parent_id = p.id
   `;
 
-    const conditions = [];
+    const conditions = ['f.deleted_at IS NULL'];
     const values = [];
 
     if (name) {

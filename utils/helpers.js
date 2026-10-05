@@ -9,21 +9,16 @@ export const formatGender = (gender) => {
 export function formatInputDate(dateStr) {
   if (!dateStr) return "";
 
-  const date = new Date(dateStr);
-  date.setHours(date.getHours() + 9);
-  return date.toISOString().slice(0, 10); // YYYY-MM-DD
+  return String(dateStr).slice(0,10);
 }
 
-export function formatDate(dateStr) {
-  if (!dateStr) return "-";
+export function formatDate(dateStr, precision) {
+  if (!dateStr || precision==='UNKNOWN') return "미상";
 
-  const date = new Date(dateStr);
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1; // 0-based
-  const day = date.getDate();
+  const [year,month,day]=String(dateStr).slice(0,10).split('-').map(Number);
 
   // 월일이 1월 1일이라면 실제 모르는 것으로 간주하고 연도만 표시
-  if (month === 1 && day === 1) {
+  if (precision==='YEAR'||precision==='LEGACY'||(!precision&&month===1&&day===1)) {
     return `${year}`;
   }
 
@@ -46,7 +41,7 @@ export const filterMembersByName = (members, input) =>
   members.filter((m) => m.name.includes(input.trim()));
 
 export const isRequiredFilled = (formData) =>
-  formData.name && formData.parent_id;
+  formData.name?.trim() && (formData.parent_id || (formData.rootMember && Number(formData.generation)>0));
 
 export const sanitizeFormData = (data) => {
   const sanitize = (val) => (val === "" || val === null ? "" : val);

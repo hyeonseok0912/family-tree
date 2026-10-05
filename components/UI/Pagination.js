@@ -58,11 +58,12 @@ export default function Pagination({
           <option value={20}>20개씩</option>
         </select>
 
-        <button onClick={() => onPageChange(1)} disabled={currentPage === 1}>
+        <button aria-label="첫 페이지" onClick={() => onPageChange(1)} disabled={currentPage === 1}>
           <MdKeyboardDoubleArrowLeft />
           {!isMobile && " 처음"}
         </button>
         <button
+          aria-label="이전 페이지"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
@@ -70,15 +71,17 @@ export default function Pagination({
           {!isMobile && " 이전"}
         </button>
         <button
+          aria-label="다음 페이지"
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
+          disabled={totalPages === 0 || currentPage >= totalPages}
         >
           {!isMobile && "다음 "}
           <MdKeyboardArrowRight />
         </button>
         <button
+          aria-label="마지막 페이지"
           onClick={() => onPageChange(totalPages)}
-          disabled={currentPage === totalPages}
+          disabled={totalPages === 0 || currentPage >= totalPages}
         >
           {!isMobile && "마지막 "}
           <MdKeyboardDoubleArrowRight />

@@ -9,3 +9,7 @@ node_modules/
 
 # 기타
 .DS_Store
+.private/
+backups/
+.next/
+.verification/

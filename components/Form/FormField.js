@@ -12,6 +12,7 @@ export default function FormField({
   placeholder = "",
   rows = 3,
   options = [],
+  maxLength,
 }) {
   return (
     <label className={styles.label}>
@@ -21,6 +22,7 @@ export default function FormField({
           name={name}
           value={value ?? ""}
           onChange={onChange}
+          required={required}
           className={required ? styles.required : ""}
         >
           {options.map((opt) => (
@@ -36,16 +38,24 @@ export default function FormField({
           onChange={onChange}
           placeholder={placeholder}
           rows={rows}
+          required={required}
+          readOnly={readOnly}
+          maxLength={maxLength}
           className={`${styles.textarea} ${required ? styles.required : ""}`}
         />
       ) : (
         <input
           type={type}
+          min={type === "number" ? 1 : undefined}
+          max={type === "number" ? 2147483647 : undefined}
+          step={type === "number" ? 1 : undefined}
           name={name}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
           readOnly={readOnly}
+          required={required}
+          maxLength={maxLength}
           className={`${required ? styles.required : ""} ${
             readOnly ? styles.readOnly : ""
           }`}

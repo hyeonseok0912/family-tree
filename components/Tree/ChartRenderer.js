@@ -2,6 +2,10 @@ import { Chart } from "react-google-charts";
 import { useMemo } from "react";
 import styles from "./ChartRenderer.module.css";
 
+const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+}[character]));
+
 export default function ChartRenderer({ members, highlightedId, chartEvents }) {
   const ROOT_NODE_ID = "Root";
 
@@ -24,10 +28,10 @@ export default function ChartRenderer({ members, highlightedId, chartEvents }) {
       const node = {
         v: member.id.toString(),
         f: `
-          <div data-id="${member.id}" class="${isHighlighted ? styles.highlightnode : ""}" style="text-align: center;">
-            <div>${member.name}</div>
-            ${member.hanja ? `<div>(${member.hanja})</div>` : ""}
-            <div style="color:blue; font-style:italic;">${member.generation}세</div>
+          <div tabindex="0" role="button" aria-label="${escapeHtml(member.name)} 상세정보" data-id="${escapeHtml(member.id)}" class="${isHighlighted ? styles.highlightnode : ""}" style="text-align: center;">
+            <div>${escapeHtml(member.name)}</div>
+            ${member.hanja ? `<div>(${escapeHtml(member.hanja)})</div>` : ""}
+            <div style="color:blue; font-style:italic;">${escapeHtml(member.generation)}세</div>
           </div>
         `,
       };

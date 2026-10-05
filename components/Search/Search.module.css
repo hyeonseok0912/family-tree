@@ -108,4 +108,8 @@
 
 .react-datepicker-popper {
   z-index: 9999 !important;
-}
+}.yearPickerWrapper > div { flex:1; min-width:0; }
+.yearPickerWrapper :global(.react-datepicker-wrapper), .yearPickerWrapper :global(.react-datepicker__input-container) { width:100%; min-width:0; }
+.searchBox { max-width:1240px; margin:20px auto; border:1px solid #dce4eb; box-shadow:none; }
+@media(max-width:1280px) { .searchBox { margin:20px; } }
+@media(max-width:600px) { .searchBox { margin:12px 10px; } .yearPicker { font-size:16px; padding:10px 8px; } .input { font-size:16px; } }

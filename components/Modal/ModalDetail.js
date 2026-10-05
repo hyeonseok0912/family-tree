@@ -1,37 +1,55 @@
-import { useEffect, useState } from "react";
+import presentation from "../../utils/recordPresentation.cjs";
+import { useEffect, useState, useRef } from "react";
 import styles from "./ModalDetail.module.css";
 import ModalEdit from "./ModalEdit";
 import { formatGender, formatDate } from "../../utils/helpers";
 import Swal from "sweetalert2";
+import {memberAction} from '../Admin/DeletedMembers';
+import useDialogFocus from "../hooks/useDialogFocus";
+import useAuth from '../hooks/useAuth';
 
-export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
+export default function ModalDetail({ member, onClose, onUpdated, isAdmin, onShowInTree, onDeleted }) {
+  const {user}=useAuth();
+  const requestRef=useRef(0);
   const [isEditing, setIsEditing] = useState(false);
+  const dialogRef=useDialogFocus(onClose,!isEditing);
   const [localMember, setLocalMember] = useState(member);
   const [historyStack, setHistoryStack] = useState([]);
   const [showSiblings, setShowSiblings] = useState(false);
   const [showChildren, setShowChildren] = useState(false);
   const [relatives, setRelatives] = useState({ siblings: [], children: [] });
   const [showSpouses, setShowSpouses] = useState(false);
+  const memberIdRef=useRef(localMember.id);
+  memberIdRef.current=localMember.id;
 
   useEffect(() => {
+    let active = true;
+    requestRef.current++;
     if (member?.id) {
       fetch("/api/member", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: member.id }),
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) throw new Error("상세 조회 실패");
+          return res.json();
+        })
         .then((data) => {
+          if (!active) return;
           setLocalMember(data);
           setHistoryStack([]);
           setShowSiblings(false);
           setShowChildren(false);
+          setShowSpouses(false);
         })
         .catch((err) => {
+          if (!active) return;
           console.error("상세 정보 조회 실패:", err);
           Swal.fire("오류", "구성원 정보를 불러오지 못했습니다.", "error");
         });
     }
+    return () => { active = false; };
   }, [member]);
 
   const fetchRelatives = async () => {
@@ -44,21 +62,25 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
           parentId: localMember.parent_id,
         }),
       });
+      if (!res.ok) throw new Error("형제/자식 조회 실패");
       const data = await res.json();
+      if (memberIdRef.current!==localMember.id) return false;
       setRelatives(data);
+      return true;
     } catch (err) {
       console.error("형제/자식 조회 실패:", err);
       Swal.fire("조회 실패", "형제나 자식 정보를 가져올 수 없습니다.", "error");
+      return false;
     }
   };
 
   const toggleSiblings = async () => {
-    if (!showSiblings) await fetchRelatives();
+    if (!showSiblings && !(await fetchRelatives())) return;
     setShowSiblings(!showSiblings);
   };
 
   const toggleChildren = async () => {
-    if (!showChildren) await fetchRelatives();
+    if (!showChildren && !(await fetchRelatives())) return;
     setShowChildren(!showChildren);
   };
 
@@ -72,6 +94,7 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
     });
 
     if (!confirm.isConfirmed) return;
+    const requestId=++requestRef.current;
 
     try {
       const res = await fetch("/api/member", {
@@ -79,12 +102,14 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       });
+      if (!res.ok) throw new Error("상세 조회 실패");
       const next = await res.json();
-      if (next) {
+      if (next && requestId===requestRef.current) {
         setHistoryStack((prev) => [...prev, localMember]);
         setLocalMember(next);
         setShowSiblings(false);
         setShowChildren(false);
+          setShowSpouses(false);
       }
     } catch (err) {
       console.error("상세 조회 실패:", err);
@@ -93,12 +118,14 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
   };
 
   const handleGoBack = () => {
-    const prev = historyStack.pop();
+    requestRef.current++;
+    const prev = historyStack[historyStack.length - 1];
     if (prev) {
       setLocalMember(prev);
-      setHistoryStack([...historyStack]);
+      setHistoryStack(historyStack.slice(0, -1));
       setShowSiblings(false);
       setShowChildren(false);
+          setShowSpouses(false);
     }
   };
 
@@ -119,11 +146,12 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
 
   return (
     <div className={styles.backdrop} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="구성원 상세정보" className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <button className={styles.closeBtn} onClick={onClose}>
           ✖
         </button>
-        <h2>{localMember.name} 상세 정보</h2>
+        <h2>{localMember.name} 상세 정보 {presentation.hasManagementAccess(user) && <small>#{localMember.id}</small>}</h2>
+        {onShowInTree&&<button className={styles.showInTreeBtn} onClick={()=>{onClose();onShowInTree(localMember.id);}}>→ 가계도로 이동해서 보기</button>}
 
         <div className={styles.toggleGroup}>
           {localMember.parent_id && (
@@ -155,13 +183,13 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
             <tr>
               <th>출생</th>
               <td className={styles.notesCell}>
-                {formatDate(localMember.birth_date)}
+                {formatDate(localMember.birth_date,localMember.birth_date_precision)}
               </td>
             </tr>
             <tr>
               <th>사망</th>
               <td className={styles.notesCell}>
-                {formatDate(localMember.death_date)}
+                {formatDate(localMember.death_date,localMember.death_date_precision)}
               </td>
             </tr>
             <tr>
@@ -179,6 +207,7 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
                     >
                       {localMember.parent_name}(父)
                     </span>
+                    {onShowInTree && <button onClick={()=>{onClose();onShowInTree(localMember.parent_id);}}>부모 가계도</button>}
                     {localMember.mother_nm && `, ${localMember.mother_nm}(母)`}
                   </>
                 ) : (
@@ -242,6 +271,7 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
                     onClick={() => handleGoToMember(s.id)}
                   >
                     {s.name}
+                    {onShowInTree&&<button onClick={event=>{event.stopPropagation();onClose();onShowInTree(s.id);}}>가계도</button>}
                   </li>
                 ))}
               </ul>
@@ -263,6 +293,7 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
                     onClick={() => handleGoToMember(c.id)}
                   >
                     {c.name}
+                    {onShowInTree&&<button onClick={event=>{event.stopPropagation();onClose();onShowInTree(c.id);}}>가계도</button>}
                   </li>
                 ))}
               </ul>
@@ -272,6 +303,7 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
           </div>
         )}
 
+        {presentation.hasManagementAccess(user) && <p className={styles.metadata}>등록자: {localMember.created_by_name || "상위관리자"} · 최종 수정자: {localMember.updated_by_name || "상위관리자"}<br/>등록: {presentation.formatRecordDate(localMember.created_at)} · 수정: {presentation.formatRecordDate(localMember.updated_at)}</p>}
         <div className={styles.buttonGroup}>
           {historyStack.length > 0 && (
             <button className={styles.backBtn} onClick={handleGoBack}>
@@ -281,7 +313,13 @@ export default function ModalDetail({ member, onClose, onUpdated, isAdmin }) {
           <button className={styles.cancelBtn} onClick={onClose}>
             닫기
           </button>
-          {isAdmin && (
+          {isAdmin && user && !user.must_change_password && (user.role==='SUPER_ADMIN'||(user.permissions?.delete && localMember.created_by != null && String(localMember.created_by)===String(user.id))) && <button onClick={async()=>{
+            const result=await Swal.fire({title:`${localMember.name} 삭제`,text:'삭제 후 목록에서 복원할 수 있습니다. 삭제 사유를 입력해주세요.',input:'text',showCancelButton:true,confirmButtonText:'삭제',cancelButtonText:'취소',inputValidator:value=>!value.trim()?'삭제 사유가 필요합니다.':undefined});
+            if(!result.isConfirmed)return;
+            try{await memberAction({action:'delete',id:localMember.id,reason:result.value});onDeleted?.(localMember.id);onClose();}
+            catch(error){Swal.fire('삭제 실패',error.message,'error');}
+          }}>삭제</button>}
+          {isAdmin && user && !user.must_change_password && (user.role==='SUPER_ADMIN'||(user.permissions?.update && localMember.created_by != null && String(localMember.created_by)===String(user.id))) && (
             <button
               className={styles.editBtn}
               onClick={() => setIsEditing(true)}

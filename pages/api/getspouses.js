@@ -10,11 +10,13 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: "member_id is required" });
   }
 
-  const client = await pool.connect();
+  let client;
   try {
+    client=await pool.connect();
     const result = await client.query(
       `
       SELECT 
+        s.id,
         s.spouse_nm AS name,
         s.order_no
       FROM spouse s
@@ -29,6 +31,6 @@ export default async function handler(req, res) {
     console.error("배우자 조회 실패:", err);
     res.status(500).json({ message: "Internal Server Error" });
   } finally {
-    client.release();
+    client?.release();
   }
 }

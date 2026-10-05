@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict');
+const {parseDateInput:p,dateInputValue,datesInOrder}=require('../utils/dates.cjs');
+assert.deepEqual(p('0'),{date:null,precision:'UNKNOWN'});
+assert.deepEqual(p('1932'),{date:'1932-01-01',precision:'YEAR'});
+assert.equal(p('2000.02.29').date,'2000-02-29');
+assert.equal(p('0004-02-29').date,'0004-02-29');
+for(const input of ['1900-02-29','2023-02-29','2024-13-01','0000','2024-04-31','2024-00-01'])assert.throws(()=>p(input));
+assert.throws(()=>p('2024-01-01','INVALID'));
+assert.equal(p('1932-01-01','DAY').precision,'DAY');
+assert.equal(p('1932-01-01','LEGACY').precision,'LEGACY');
+assert.equal(dateInputValue('1932-01-01','YEAR'),'1932');
+assert.ok(datesInOrder(p('1932-12-31'),p('1932')));
+assert.ok(!datesInOrder(p('1933'),p('1932')));
+console.log('PASS: unknown/year/full/legacy dates, calendar validation including leap centuries, precision and date order');

@@ -1,21 +1,11 @@
-// import pkg from "pg";
-// const { Pool } = pkg;
-
-// const pool = new Pool({
-//   connectionString: process.env.DATABASE_URL,
-//   ssl: { rejectUnauthorized: false }, // Neon은 SSL 필수
-// });
-
-// export default pool;
-
 import pkg from "pg";
 const { Pool } = pkg;
-
-const isProduction = process.env.NODE_ENV === "production";
-
+// SQL DATE is a calendar date, not a timestamp.
+pkg.types.setTypeParser(1082, value => value);
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: isProduction ? { rejectUnauthorized: false } : false,
+  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: 30000,
+  max: 10,
 });
-
 export default pool;

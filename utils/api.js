@@ -1,5 +1,26 @@
 // API 요청을 처리하는 함수들
 
+export const fetchAdminMemo = async () => {
+  const res = await fetch("/api/adminmemo", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "get" }),
+  });
+  if (!res.ok) throw new Error("메모 조회 실패");
+  const data = await res.json();
+  if (typeof data.content !== "string") throw new Error("잘못된 메모 응답");
+  return data.content;
+};
+
+export const saveAdminMemo = async (content) => {
+  const res = await fetch("/api/adminmemo", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "save", content }),
+  });
+  if (!res.ok) throw new Error("메모 저장 실패");
+  const data = await res.json();
+  if (data.success !== true) throw new Error("메모 저장 실패");
+};
+
 export const fetchAllMembers = async (sort = "asc", query = {}) => {
   const res = await fetch(`/api/tablelist`, {
     method: "POST",
@@ -48,7 +69,7 @@ export const updatemember = async (data) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(sanitized),
   });
-  if (!res.ok) throw new Error("멤버 수정 실패");
+  if (!res.ok) {const error=await res.json();throw new Error(error.message||"멤버 수정 실패");}
   return await res.json();
 };
 
@@ -60,7 +81,7 @@ export const createmember = async (data) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(sanitized),
   });
-  if (!res.ok) throw new Error("멤버 생성 실패");
+  if (!res.ok) {const error=await res.json();throw new Error(error.message||"멤버 생성 실패");}
   return await res.json();
 };
 

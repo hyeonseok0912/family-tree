@@ -16,8 +16,13 @@ export default function TableList({
   setMembers,
   isAdmin,
   showLoginModal,
+  onShowInTree,
 }) {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [retry, setRetry] = useState(0);
+  const [isMobile,setIsMobile]=useState(false);
+  useEffect(()=>{const resize=()=>setIsMobile(window.innerWidth<=600);resize();window.addEventListener("resize",resize);return()=>window.removeEventListener("resize",resize);},[]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedMember, setSelectedMember] = useState(null);
   const [itemsPerPage, setItemsPerPage] = useState(() => {
@@ -30,8 +35,10 @@ export default function TableList({
   useEffect(() => {
     if (showLoginModal) return;
 
+    let active = true;
     const fetchMembers = async () => {
       setLoading(true);
+      setError("");
 
       try {
         const params = new URLSearchParams();
@@ -43,34 +50,43 @@ export default function TableList({
         params.append("sort", "table");
 
         const data = await fetchAllMembers("table", searchQuery || {});
-        setMembers(data);
+        if (active) setMembers(data);
       } catch (err) {
-        console.error("가족 정보 불러오기 실패:", err);
+        if (active) setError(err.message);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     };
 
     fetchMembers();
-  }, [searchQuery, showLoginModal, refreshList]);
+    return () => { active = false; };
+  }, [searchQuery, showLoginModal, refreshList, retry, setMembers]);
 
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
   const currentMembers = members.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(members.length / itemsPerPage);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(Math.max(page, 1), Math.max(totalPages, 1)));
+  }, [totalPages]);
+
   const handleMemberUpdate = (updated) => {
-    setMembers((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
+    setRetry(value=>value+1);
     setSelectedMember(updated);
   };
 
-  const isMobile = typeof window !== "undefined" && window.innerWidth <= 600;
+
 
   return (
     <>
       {loading ? (
         <LoadingOverlay />
-      ) : (
+      ) : error ? <p role="alert">{error} <button onClick={()=>setRetry(value=>value+1)}>다시 불러오기</button></p> : (
         <>
           <div className={styles.tableWrapper}>
             <h2>📜 손씨 가계도 구성원 목록</h2>
@@ -110,7 +126,7 @@ export default function TableList({
                           </button>
                         </td>
                         <td>{formatGender(m.gender)}</td>
-                        <td>{formatDate(m.birth_date)}</td>
+                        <td>{formatDate(m.birth_date,m.birth_date_precision)}</td>
                         <td>{m.generation}</td>
                         <td>
                           <button
@@ -155,7 +171,7 @@ export default function TableList({
                       </div>
                       <div className="row">
                         <span className={styles.label}>출생</span>{" "}
-                        {formatDate(m.birth_date)}
+                        {formatDate(m.birth_date,m.birth_date_precision)}
                       </div>
                       <div className="row">
                         <span className={styles.label}>세대</span>{" "}
@@ -192,7 +208,9 @@ export default function TableList({
             <ModalDetail
               member={selectedMember}
               onClose={() => setSelectedMember(null)}
-              onUpdated={() => {}}
+              onUpdated={handleMemberUpdate}
+              onShowInTree={onShowInTree}
+              onDeleted={(id)=>{setMembers(prev=>prev.filter(m=>m.id!==id));setSelectedMember(null);}}
               isAdmin={isAdmin}
             />
           )}

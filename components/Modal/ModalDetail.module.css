@@ -235,3 +235,13 @@
     padding: 0.25rem;
   }
 }
+.metadata { padding:14px; margin-top:16px; border:1px solid #dce4eb; border-radius:8px; background:#f4f7fa; color:#526579; font-size:.85rem; line-height:1.9; overflow-wrap:anywhere; }
+.toggleGroup { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.spouseHeader { flex-wrap:wrap; }
+.modal { max-height:90dvh; overscroll-behavior:contain; }
+.modal h2 { padding-right:32px; overflow-wrap:anywhere; }
+.detailTable { table-layout:fixed; }
+.detailTable td { overflow-wrap:anywhere; }
+.list li { overflow-wrap:anywhere; }
+
+.showInTreeBtn { font-weight: 700; }

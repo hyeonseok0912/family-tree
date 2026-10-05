@@ -2,7 +2,7 @@ name: Ping Render App
 
 on:
   schedule:
-    - cron: '*/40 * * * *'  # 매 40분마다 실행 (UTC 기준)
+    - cron: '*/30 * * * *'  # 매 30분마다 실행 (UTC 기준)
   workflow_dispatch:         # 수동 실행도 가능
 
 jobs:
@@ -11,4 +11,4 @@ jobs:
 
     steps:
       - name: Ping Render URL
-        run: curl -fsS https://milseongson.onrender.com/api/ping
+        run: curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" https://milseongson.onrender.com/api/ping

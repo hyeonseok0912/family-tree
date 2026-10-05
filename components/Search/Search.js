@@ -16,6 +16,7 @@ export default function Search({ onSearch }) {
       endYear: endYear ? endYear.getFullYear() : "",
     };
 
+    if (query.startYear && query.endYear && query.startYear>query.endYear) {setError("시작 연도는 종료 연도보다 늦을 수 없습니다.");return;}
     setError("");
     onSearch(query);
   };
@@ -28,7 +29,9 @@ export default function Search({ onSearch }) {
   return (
     <form onSubmit={handleSubmit} className={styles.searchBox}>
       <div className={styles.yearPickerWrapper}>
+        <span id="birth-start-label" className="sr-only">출생 시작 연도</span><span id="birth-end-label" className="sr-only">출생 종료 연도</span>
         <DatePicker
+          ariaLabelledBy="birth-start-label"
           selected={startYear}
           onChange={(date) => setStartYear(date)}
           showYearPicker
@@ -38,6 +41,7 @@ export default function Search({ onSearch }) {
         />
         <span> ~ </span>
         <DatePicker
+          ariaLabelledBy="birth-end-label"
           selected={endYear}
           onChange={(date) => setEndYear(date)}
           showYearPicker
@@ -50,6 +54,8 @@ export default function Search({ onSearch }) {
       <div className={styles.nameSearchWrapper}>
         <input
           type="text"
+          aria-label="검색할 이름"
+          maxLength={80}
           placeholder="이름을 입력하세요"
           className={styles.input}
           value={name}

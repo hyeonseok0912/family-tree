@@ -1,0 +1,23 @@
+name: Daily Database Backup
+on:
+  schedule:
+    - cron: '0 18 * * *' # 03:00 KST
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create full database dump
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          test -n "$DATABASE_URL" || { echo "Configure the DATABASE_URL repository secret first."; exit 1; }
+          docker run --rm -e DATABASE_URL postgres:17 sh -c 'exec pg_dump --dbname="$DATABASE_URL" --format=custom --no-owner --no-acl' > family-tree.dump
+      - name: Store backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: family-tree-database-${{ github.run_id }}
+          path: family-tree.dump
+          retention-days: 30

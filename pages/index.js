@@ -1,3 +1,4 @@
+import presentation from "../utils/recordPresentation.cjs";
 import { useState } from "react";
 import TableList from "@/components/Members/TableList";
 import ModalNew from "@/components/Modal/ModalNew";
@@ -7,6 +8,11 @@ import AdminLoginModal from "@/components/Modal/AdminLoginModal";
 import AdminMemoTab from "@/components/Admin/AdminMemoTab";
 import styles from "./TabView.module.css";
 import Head from "next/head";
+import InstallApp from "@/components/UI/InstallApp";
+import useAuth from '@/components/hooks/useAuth';
+import AdminAccounts from '@/components/Admin/AdminAccounts';
+import DeletedMembers from '@/components/Admin/DeletedMembers';
+import MergeMembers from '@/components/Admin/MergeMembers';
 
 export default function Home() {
   const [members, setMembers] = useState([]);
@@ -15,22 +21,28 @@ export default function Home() {
   const [focusId, setFocusId] = useState(null);
   const [highlightedId, setHighlightedId] = useState(null);
   const [showNewModal, setShowNewModal] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(true);
+  const { user, logout, error: authError } = useAuth();
+  const isAdmin = presentation.hasManagementAccess(user);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignup,setShowSignup]=useState(false);
   const [newlyCreated, setNewlyCreated] = useState(null);
   const [refreshList, setRefreshList] = useState(false);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
+  const showMemberInTree = (id) => {
+    setHighlightedId(null);setFocusId(id);setActiveTab('tree');
+  };
+  const refreshMembers = () => setRefreshList(previous=>!previous);
 
   const handleLogin = () => {
-    setIsAdmin(true);
     setShowLoginModal(false);
   };
 
-  const handleLogout = () => {
-    setIsAdmin(false);
+  const handleLogout = async () => {
+    try { await logout(); } catch { alert('로그아웃에 실패했습니다. 다시 시도해주세요.'); return; }
+    setShowSignup(false);
     setShowLoginModal(true);
     setActiveTab("table"); // 관리자 탭 강제 퇴출
   };
@@ -38,6 +50,11 @@ export default function Home() {
   return (
     <main>
       <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+        <meta name="theme-color" content="#183b56"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <link rel="manifest" href="/manifest.webmanifest"/>
+        <link rel="apple-touch-icon" href="/icons/icon-192.png"/>
         <title>밀성 손씨 세보</title>
         <meta
           name="description"
@@ -65,21 +82,24 @@ export default function Home() {
           </div>
         </div>
         <div className={styles.loginBox}>
-          {isAdmin ? (
+          {user ? (
             <>
-              <span>관리자님 안녕하세요</span>
+              <span>{user.display_name}님 ({user.role === 'SUPER_ADMIN' ? '상위 관리자' : isAdmin ? '하위 관리자' : '조회 전용'})</span>
               <button onClick={handleLogout}>로그아웃</button>
             </>
           ) : (
             <>
               <span>열람자 모드</span>
-              <button onClick={() => setShowLoginModal(true)}>Login</button>
+              <button onClick={() => {setShowSignup(false);setShowLoginModal(true);}}>관리자 로그인 · 회원가입</button>
             </>
           )}
         </div>
       </header>
 
+      <InstallApp/>
       <Search onSearch={handleSearch} />
+      {authError && <p role="alert">{authError}</p>}
+      {user?.must_change_password && <p role="alert">초기 비밀번호를 변경해야 저장할 수 있습니다. 관리자 계정 탭에서 변경해주세요.</p>}
 
       <div className={styles.tabWrapper}>
         <button
@@ -98,7 +118,7 @@ export default function Home() {
           🗂️ 가계도 보기
         </button>
 
-        {isAdmin && (
+        {user?.role === 'SUPER_ADMIN' && (
           <button
             className={activeTab === "adminMemo" ? styles.active : ""}
             onClick={() => setActiveTab("adminMemo")}
@@ -106,11 +126,15 @@ export default function Home() {
             🛠 관리자 메모
           </button>
         )}
+        {user && <button className={activeTab==='accounts'?styles.active:''} onClick={() => setActiveTab('accounts')}>{isAdmin?'관리자 계정 · 작업 이력':'내 계정'}</button>}
+        {isAdmin && <button className={activeTab==='deleted'?styles.active:''} onClick={()=>setActiveTab('deleted')}>삭제 목록 · 복원</button>}
+        {user?.role==='SUPER_ADMIN'&&<button className={activeTab==='merge'?styles.active:''} onClick={()=>setActiveTab('merge')}>동일인 병합</button>}
       </div>
 
       <div className={styles.contentBox}>
         {activeTab === "table" && (
           <>
+            <button className={styles.signupButton} onClick={()=>{setShowSignup(true);setShowLoginModal(true);}}>관리자 회원가입 신청</button>
             <TableList
               searchQuery={searchQuery}
               setActiveTab={setActiveTab}
@@ -120,9 +144,10 @@ export default function Home() {
               members={members}
               setMembers={setMembers}
               isAdmin={isAdmin}
+              onShowInTree={showMemberInTree}
             />
 
-            {isAdmin && (
+            {isAdmin && !user.must_change_password && (user.role==='SUPER_ADMIN'||user.permissions?.create) && (
               <button
                 onClick={() => setShowNewModal(true)}
                 className={styles.createButton}
@@ -141,16 +166,21 @@ export default function Home() {
             highlightedId={highlightedId}
             setHighlightedId={setHighlightedId}
             isAdmin={isAdmin}
+            onShowInTree={showMemberInTree}
           />
         )}
 
-        {activeTab === "adminMemo" && isAdmin && <AdminMemoTab />}
+        {activeTab === "adminMemo" && user?.role === 'SUPER_ADMIN' && <AdminMemoTab />}
+        {activeTab === 'accounts' && user && <AdminAccounts />}
+        {activeTab==='deleted'&&isAdmin&&<DeletedMembers onChanged={refreshMembers}/>}
+        {activeTab==='merge'&&user?.role==='SUPER_ADMIN'&&<MergeMembers onChanged={refreshMembers}/>}
       </div>
 
       {showNewModal && (
         <ModalNew
           onClose={() => setShowNewModal(false)}
           onCreated={(created) => {
+            setRefreshList((previous) => !previous);
             setMembers((prev) =>
               [...prev, created].sort((a, b) => b.id - a.id)
             );
@@ -161,6 +191,7 @@ export default function Home() {
 
       {showLoginModal && (
         <AdminLoginModal
+          initialRegister={showSignup}
           onLogin={handleLogin}
           onClose={() => setShowLoginModal(false)}
         />

@@ -1,7 +1,10 @@
+import {requireOperator} from "../../server/cronAuth";
+import {sendError} from "../../server/auth";
 // pages/api/ping-db.js
 import pool from "@/server/db_pg"; // PostgreSQL 연결
 
 export default async function handler(req, res) {
+  try {await requireOperator(req);}catch(error){return sendError(res,error);}
   const MAX_RETRIES = 5;
   const RETRY_DELAY_MS = 1000;
   const targetUrl = "https://milseongson.onrender.com/";
@@ -12,7 +15,7 @@ export default async function handler(req, res) {
 
   const ping = async () => {
     try {
-      const response = await fetch(targetUrl);
+      const response = await fetch(targetUrl,{signal:AbortSignal.timeout(10000)});
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       success = true;
     } catch (err) {

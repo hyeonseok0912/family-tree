@@ -10,6 +10,7 @@ export default function useParentSelection(
   const [showParentDropdown, setShowParentDropdown] = useState(false);
 
   useEffect(() => {
+    let active=true;
     const fetchParents = async () => {
       try {
         const res = await fetch("/api/tablelist", {
@@ -17,12 +18,14 @@ export default function useParentSelection(
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sort: "asc" }),
         });
+        if (!res.ok) throw new Error("부모 목록 조회 실패");
         const data = await res.json();
 
+        if(!active)return;
         setParentOptions(Array.isArray(data) ? data : []);
 
         if (initialParentId) {
-          const selectedParent = data.find((m) => m.id === initialParentId);
+          const selectedParent = Array.isArray(data) && data.find((m) => String(m.id) === String(initialParentId));
           if (selectedParent) {
             setParentNameInput(getParentLabel(selectedParent));
           }
@@ -33,6 +36,7 @@ export default function useParentSelection(
     };
 
     fetchParents();
+    return()=>{active=false;};
   }, [initialParentId]);
 
   const handleParentSelect = (option) => {
@@ -43,9 +47,18 @@ export default function useParentSelection(
     setFormData((prev) => ({
       ...prev,
       parent_id: option.id,
+      rootMember: false,
+      mother_nm: '',
+      mother_spouse_id: null,
       generation: String(childGen),
     }));
     setShowParentDropdown(false);
+  };
+
+  const handleParentInputChange = (event) => {
+    setParentNameInput(event.target.value);
+    setShowParentDropdown(true);
+    setFormData((prev) => ({ ...prev, parent_id: "", generation: "", mother_nm: "", mother_spouse_id:null,rootMember:false }));
   };
 
   return {
@@ -56,5 +69,6 @@ export default function useParentSelection(
     showParentDropdown,
     setShowDropdown: setShowParentDropdown,
     handleParentSelect,
+    handleParentInputChange,
   };
 }

@@ -1,6 +1,6 @@
 .treeWrapper {
   position: relative;
-  overflow: auto;
+  overflow: visible;
   height: auto;
   background-color: #f8f9fa;
   border: 1px solid #ddd;
@@ -15,7 +15,10 @@
 /* 모바일 대응 */
 @media (max-width: 600px) {
   .treeWrapper {
-    height: 500px;
-    overflow: auto;
+    height: auto;
+    overflow: visible;
   }
 }
+.searchResults { padding:16px; margin-bottom:16px; background:#f2f6fa; border:1px solid #dce4eb; border-radius:10px; }
+.searchResults p { margin-bottom:8px; }
+.searchResults button { border:1px solid #b9c7d4; background:white; border-radius:8px; padding:8px 12px; margin:4px; }

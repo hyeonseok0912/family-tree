@@ -30,3 +30,5 @@
     max-height: 60vh;
   }
 }
+
+.treeContainer { overscroll-behavior: auto; touch-action: pan-x pan-y; }
