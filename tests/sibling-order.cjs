@@ -1,0 +1,14 @@
+const assert = require('node:assert/strict');
+const {sortTreeMembers} = require('../utils/siblingOrder.cjs');
+const m = (id, gender, birth_date=null, birth_date_precision=birth_date?'DAY':'UNKNOWN', parent_id=1) => ({id,gender,birth_date,birth_date_precision,parent_id});
+const rightToLeft = members => sortTreeMembers(members).map(m=>m.id).reverse();
+assert.deepEqual(rightToLeft([m(1,'M','1980-01-01'),m(2,'F','1970-02-01'),m(3,'M'),m(4,'F')]),[2,1,3,4]);
+assert.deepEqual(rightToLeft([m(1,'F','1980-03-01'),m(2,'M','1980-03-01')]),[2,1]);
+assert.deepEqual(rightToLeft([m(1,'F','1980-01-01','YEAR'),m(2,'M','1980-12-01'),m(3,'F','1979-12-01')]),[3,2,1]);
+assert.deepEqual(rightToLeft([m(1,'M','1980-12-01'),m(2,'F','1980-01-01')]),[2,1]);
+assert.deepEqual(rightToLeft([m(1,'F','1900-01-01','UNKNOWN'),m(2,'M'),m(3,'F','2000-01-01')]),[3,2,1]);
+const input=[m(1,'M'),m(2,'M'),m(3,'F'),m(4,'M',null,'UNKNOWN',2)];
+assert.deepEqual(rightToLeft(input.slice(0,3)),[1,2,3]);
+assert.deepEqual(sortTreeMembers(input).filter(m=>m.parent_id===1).map(m=>m.id),[3,2,1]);
+assert.deepEqual(input.map(m=>m.id),[1,2,3,4]);
+console.log('PASS: sibling birth dates, missing dates, partial years, gender ties and stable groups');

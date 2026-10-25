@@ -58,6 +58,17 @@ async function snapshot(client) {
       return;
     }
     if(mode==='backup') return await snapshot(client);
+    if(mode==='add-son-ancestors') {
+      await snapshot(client);
+      await client.query('BEGIN');
+      try {
+        await client.query("SELECT pg_advisory_xact_lock(hashtext('family-tree-migrations'))");
+        await client.query(fs.readFileSync(path.join(__dirname,'../data-migrations/001-son-ancestors.sql'),'utf8'));
+        await client.query('COMMIT');
+        console.log('Ancestor data migration completed.');
+      } catch(error) {await client.query('ROLLBACK');throw error;}
+      return;
+    }
     if(mode==='migrate') {
       await snapshot(client);
       await client.query('BEGIN');
@@ -99,6 +110,6 @@ async function snapshot(client) {
       }catch(error){await client.query('ROLLBACK');throw error;}
       return;
     }
-    throw new Error('Usage: node scripts/database.cjs inspect|backup|migrate|bootstrap|restore SNAPSHOT --confirm-replace-all-data [--url-file PRIVATE_FILE]');
+    throw new Error('Usage: node scripts/database.cjs inspect|backup|migrate|add-son-ancestors|bootstrap|restore SNAPSHOT --confirm-replace-all-data [--url-file PRIVATE_FILE]');
   }finally{client.release();}
 })().catch(error=>{console.error('Database operation failed: '+error.message);process.exitCode=1;}).finally(()=>pool.end());

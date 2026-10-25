@@ -24,6 +24,7 @@ async function load(relativePath, overrides = {}) {
     require: (name) => {
       if (Object.hasOwn(overrides, name)) return overrides[name];
       if (name.endsWith('treeScroll.cjs')) return require('../utils/treeScroll.cjs');
+      if (name.endsWith('siblingOrder.cjs')) return require('../utils/siblingOrder.cjs');
       if (name === 'react') return mockReact;
       if (name.endsWith('.css')) return {};
       if (name === 'react-google-charts') return { Chart: () => null };

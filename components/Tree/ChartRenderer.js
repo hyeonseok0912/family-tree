@@ -1,6 +1,7 @@
 import { Chart } from "react-google-charts";
 import { useMemo } from "react";
 import styles from "./ChartRenderer.module.css";
+import siblingOrder from "../../utils/siblingOrder.cjs";
 
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
@@ -21,7 +22,7 @@ export default function ChartRenderer({ members, highlightedId, chartEvents }) {
       ],
     ];
   
-    members.forEach((member) => {
+    siblingOrder.sortTreeMembers(members).forEach((member) => {
       const parent = member.parent_id ? member.parent_id.toString() : ROOT_NODE_ID;
       const isHighlighted = highlightedId?.toString() === member.id.toString();
   
