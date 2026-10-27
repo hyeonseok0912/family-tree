@@ -1,60 +1,36 @@
-import { Chart } from "react-google-charts";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import styles from "./ChartRenderer.module.css";
-import siblingOrder from "../../utils/siblingOrder.cjs";
+import treeLayout from "../../utils/treeLayout.cjs";
 
-const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-}[character]));
+export default function ChartRenderer({ members, highlightedId, onSelect, onReady }) {
+  const layout = useMemo(() => treeLayout.layoutTree(members), [members]);
 
-export default function ChartRenderer({ members, highlightedId, chartEvents }) {
-  const ROOT_NODE_ID = "Root";
-
-  const chartData = useMemo(() => {
-    const data = [
-      [
-        {
-          v: ROOT_NODE_ID,
-          f: "족보<div style='color:red; font-style:italic'>시작</div>",
-        },
-        "",
-        "",
-      ],
-    ];
-  
-    siblingOrder.sortTreeMembers(members).forEach((member) => {
-      const parent = member.parent_id ? member.parent_id.toString() : ROOT_NODE_ID;
-      const isHighlighted = highlightedId?.toString() === member.id.toString();
-  
-      const node = {
-        v: member.id.toString(),
-        f: `
-          <div tabindex="0" role="button" aria-label="${escapeHtml(member.name)} 상세정보" data-id="${escapeHtml(member.id)}" class="${isHighlighted ? styles.highlightnode : ""}" style="text-align: center;">
-            <div>${escapeHtml(member.name)}</div>
-            ${member.hanja ? `<div>(${escapeHtml(member.hanja)})</div>` : ""}
-            <div style="color:blue; font-style:italic;">${escapeHtml(member.generation)}세</div>
-          </div>
-        `,
-      };
-  
-      data.push([node, parent, ""]);
-    });
-  
-    return data;
-  }, [members, highlightedId]);  
+  useEffect(() => { onReady(); }, [layout, onReady]);
 
   return (
-    <Chart
-      chartType="OrgChart"
-      data={chartData}
-      options={{
-        allowHtml: true,
-        nodeClass: styles.orgNode,
-        selectedNodeClass: styles.selectedOrgNode,
-      }}
-      width="100%"
-      height="600px"
-      chartEvents={chartEvents}
-    />
+    <div className={styles.chart} style={{ width: layout.width, height: layout.height }}>
+      <svg className={styles.connectors} width={layout.width} height={layout.height} aria-hidden="true">
+        {layout.edges.map(edge => <path key={edge.childId} d={edge.path} />)}
+      </svg>
+      {layout.nodes.map(node => {
+        const member = node.member;
+        const highlighted = member && String(highlightedId) === node.id;
+        const position = { left: node.x, top: node.y, width: layout.nodeWidth, height: layout.nodeHeight };
+        return member ? (
+          <button key={node.id} type="button" data-id={node.id}
+            aria-label={`${member.name} 상세정보`} title={`${member.name}${member.hanja ? ` (${member.hanja})` : ""}`}
+            className={`${styles.orgNode} ${highlighted ? styles.highlightnode : ""}`}
+            style={position} onClick={() => onSelect(member)}>
+            <span className={styles.name}>{member.name}</span>
+            {member.hanja && <span className={styles.hanja}>({member.hanja})</span>}
+            <span className={styles.generation}>{member.generation}세</span>
+          </button>
+        ) : (
+          <div key={node.id} data-tree-root className={`${styles.orgNode} ${styles.root}`} style={position}>
+            <span>족보</span><span className={styles.rootLabel}>시작</span>
+          </div>
+        );
+      })}
+    </div>
   );
 }

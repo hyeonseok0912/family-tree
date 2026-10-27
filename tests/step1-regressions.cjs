@@ -23,6 +23,7 @@ async function load(relativePath, overrides = {}) {
     module, exports: module.exports,
     require: (name) => {
       if (Object.hasOwn(overrides, name)) return overrides[name];
+      if (name.endsWith('treeLayout.cjs')) return require('../utils/treeLayout.cjs');
       if (name.endsWith('treeScroll.cjs')) return require('../utils/treeScroll.cjs');
       if (name.endsWith('siblingOrder.cjs')) return require('../utils/siblingOrder.cjs');
       if (name === 'react') return mockReact;
@@ -42,30 +43,27 @@ async function load(relativePath, overrides = {}) {
     { id: 20, name: '둘째', generation: 2, parent_id: 10 },
   ];
   const ChartRenderer = await load('components/Tree/ChartRenderer.js');
-  const chart = ChartRenderer({ members, chartEvents: [] });
-  const data = chart.props.data;
-  assert.equal(data[0][0].v, 'Root');
-  assert.equal(data[1][0].v, '10');
-  assert.ok(data[1][0].f.includes('&lt;img'));
-  assert.ok(data[1][0].f.includes('孫&amp;&lt;'));
-  assert.ok(!data[1][0].f.includes('<img'));
-  console.log('PASS: chart values escape HTML while preserving node IDs');
-
   let selected = null;
+  const chart = ChartRenderer({ members, onSelect: member => { selected = member; }, onReady() {} });
+  const { renderToStaticMarkup } = require('react-dom/server');
+  const html = renderToStaticMarkup(chart);
+  assert.ok(html.includes('&lt;img'));
+  assert.ok(html.includes('孫&amp;&lt;'));
+  assert.ok(!html.includes('<img'));
+  assert.ok(html.includes('data-id="10"'));
+  const nodes = chart.props.children[1];
+  assert.equal(nodes[0].type, 'div');
+  nodes[1].props.onClick();
+  assert.equal(selected.id, 10);
+  nodes[2].props.onClick();
+  assert.equal(selected.id, 20);
+  console.log('PASS: chart escapes names, ignores root and selects first/last members');
+
   const Wrapper = await load('components/Tree/TreeScrollWrapper.js');
   const wrapper = Wrapper({ members, wrapperRef: { current: null }, isDragging: { current: false }, setSelectedMember: (member) => { selected = member; } });
-  const select = wrapper.props.children.props.children.props.chartEvents[0].callback;
-  const choose = (row) => select({ chartWrapper: {
-    getChart: () => ({ getSelection: () => [{ row }] }),
-    getDataTable: () => ({ getValue: (index) => data[index][0].v }),
-  } });
-  choose(0);
-  assert.equal(selected, null);
-  choose(1);
+  wrapper.props.children.props.children.props.onSelect(members[0]);
   assert.equal(selected.id, 10);
-  choose(2);
-  assert.equal(selected.id, 20);
-  console.log('PASS: root ignored and first/last nodes select the correct member');
+  console.log('PASS: tree selection opens the correct member');
 
   let formData = { parent_id: 10, generation: '2', mother_nm: '기존 모', name: '자녀' };
   const useParentSelection = await load('components/hooks/useParentSelection.js');

@@ -1,4 +1,4 @@
-// OrgChart consumes siblings from left to right. Priority is defined right to left.
+// Tree layout consumes siblings from left to right. Priority is defined right to left.
 function sortTreeMembers(members) {
   const groups = new Map();
   for (const member of members) {

@@ -1,5 +1,5 @@
 import treeScroll from "../../utils/treeScroll.cjs";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ChartRenderer from "./ChartRenderer";
 import styles from "./TreeScrollWrapper.module.css";
 
@@ -65,7 +65,7 @@ export default function TreeScrollWrapper({
         const tryScroll = () => {
           if (canceled) return;
           const targetDiv = container.querySelector(
-            `div[data-id="${focusId}"]`
+            `[data-id="${focusId}"]`
           );
           if (targetDiv) {
             const rect = targetDiv.getBoundingClientRect();
@@ -116,37 +116,23 @@ export default function TreeScrollWrapper({
     return () => { canceled = true; cancelAnimationFrame(frame); clearTimeout(pageTimer); clearTimeout(loadingTimer); };
   }, [chartReady, focusId, members, wrapperRef, clearFocusId, setHighlightedId, setLoading]);
 
-  const chartEvents = [
-    {
-      eventName: "select",
-      callback: ({ chartWrapper }) => {
-        const chart = chartWrapper.getChart();
-        const selection = chart.getSelection();
-        if (selection.length > 0) {
-          const row = selection[0].row;
-          if (row == null) return;
-          const nodeId = chartWrapper.getDataTable().getValue(row, 0);
-          const member = members.find((item) => String(item.id) === String(nodeId));
-          if (member) setSelectedMember(member);
-        }
-      },
-    },
-    {
-      eventName: "ready",
-      callback: () => { setChartReady(true); },
-    },
-  ];
+  const initialized = useRef(false);
+  const handleChartReady = useCallback(() => {
+    setChartReady(true);
+    const container = wrapperRef.current;
+    const root = container?.querySelector('[data-tree-root]');
+    if (!initialized.current && container && root) {
+      const rect = root.getBoundingClientRect();
+      container.scrollLeft += rect.left + rect.width / 2
+        - container.getBoundingClientRect().left - container.clientWidth / 2;
+      initialized.current = true;
+    }
+  }, [wrapperRef]);
 
   return (
     <div
       className={styles.treeContainer}
       ref={wrapperRef}
-      onKeyDown={event=>{
-        if(event.key!=='Enter'&&event.key!==' ')return;
-        const id=event.target.closest('[data-id]')?.dataset.id;
-        const member=members.find(item=>String(item.id)===id);
-        if(member){event.preventDefault();setSelectedMember(member);}
-      }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -166,7 +152,8 @@ export default function TreeScrollWrapper({
         <ChartRenderer
           members={members}
           highlightedId={highlightedId}
-          chartEvents={chartEvents}
+          onSelect={setSelectedMember}
+          onReady={handleChartReady}
         />
       </div>
     </div>
